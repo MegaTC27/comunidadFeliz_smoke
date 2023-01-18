@@ -1,0 +1,5 @@
+Variables globales:
+T:\UDEMY\Cypress\cypress.env.json
+
+Funciones globales para ComunidadFeliz:
+T:\UDEMY\Cypress\cypress\e2e\CF\functions.js

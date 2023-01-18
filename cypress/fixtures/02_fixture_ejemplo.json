@@ -1,0 +1,31 @@
+[
+
+  {
+    "nombre": "Nombre 1",
+    "email": "mail_01@cypress.io",
+    "direccion": "AV. UNO 1111",
+    "direccion2": "111111111111"
+  },
+
+  {
+    "nombre": "Nombre 2",
+    "email": "mail_02@cypress.io",
+    "direccion": "AV. DOS 2222",
+    "direccion2": "2222222222222"
+   },
+
+   {
+    "nombre": "Nombre 3",
+    "email": "mail_03@cypress.io",
+    "direccion": "AV. TRES 3333",
+    "direccion2": "3333333333333"
+   },
+
+   {
+    "nombre": "Nombre 4",
+    "email": "mail_04@cypress.io",
+    "direccion": "AV. CUATRO 4444",
+    "direccion2": "44444444444"
+   }
+
+]
