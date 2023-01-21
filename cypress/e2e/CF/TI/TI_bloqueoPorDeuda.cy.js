@@ -62,6 +62,10 @@ describe('Pruebas TI', () => {
             day = day - 16
         };
         
+        if (month < 10){
+            month = '0' + month 
+        }
+        
         let expDate = `${day}/${month}${year}`;
 
         cy.get('#invoice_expiration_date').clear().type(expDate,{force:true})

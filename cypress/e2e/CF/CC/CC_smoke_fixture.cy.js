@@ -32,7 +32,7 @@ describe('Smoke Test CC', () => {
             globalThis.data = data;
 
             // SUPER ADMIN
-            globalThis.WEB = data.WEB_5
+            globalThis.WEB = data.WEB_SMOKE
             globalThis.USER = data.USER_5
             globalThis.PASS = data.PASS_5
 
@@ -211,7 +211,7 @@ describe('Smoke Test CC', () => {
         cy.get('#excel-file').wait(DELAY).selectFile(EXCEL_RECAUDACIONES,{force:true}).wait(DELAY)
         cy.get('#excel-upload-submit').click({force:true})
 
-        cy.get('tbody > :nth-child(2) > :nth-child(3)').should('contain','En proceso').wait(2000).reload()
+        cy.get('tbody > :nth-child(2) > :nth-child(3)').should('contain','En proceso').wait(5000).reload()
         cy.get('tbody > :nth-child(2) > :nth-child(3)').should('contain','Importado')
 
         cy.get("#sidebar-bill").should("be.visible").click({force: true});
@@ -503,7 +503,7 @@ describe('Smoke Test CC', () => {
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
 
-        // Módulo Condóminos
+        // Módulo Copropietarios2
         cy.xpath("//span[contains(.,'Copropietarios')]").click({force:true})
         
         // Nuevo Condómino

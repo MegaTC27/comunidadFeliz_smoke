@@ -1,5 +1,11 @@
 {
   "WEB_1": "https://test1.comunidadfeliz.com/",
+  "USER_1":"mauricio.alfaro@comunidadfeliz.cl",
+  "PASS_1": "feliz21.",
+
+  "WEB_4": "https://test4.comunidadfeliz.com/",
+  "USER_4":"juan.treppo@comunidadfeliz.cl",
+  "PASS_4": "feliz21.",
 
   "WEB_5": "https://test5.comunidadfeliz.com/",
   "USER_5":"juan.treppo@comunidadfeliz.cl",

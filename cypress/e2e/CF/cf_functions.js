@@ -142,6 +142,20 @@ export const MODAL_BIBLIOTECA = () => {
   })
 }
 
+export const MODAL_NUEVA_FUNCIONALIDAD = () => {
+    // Verifcar modal de Nueva Funcionalidad
+    cy.xpath('//p').each(($el) => {
+
+      const TEXT1 = $el.text()
+      const RESULTADO = TEXT1.includes('Sumamos una nueva funcionalidad')
+      
+      if (RESULTADO){
+          cy.xpath("//a[contains(.,'Saltar tutorial')]").should('be.visible').click({force:true})
+          cy.log('####### MODAL DE NUEVA FUNCIONALIDAD CERRADO #######')
+      }
+  })
+}
+
 export const CIERRE_MODALES = () => {
     
   MODAL_TYC();
@@ -154,7 +168,8 @@ export const CIERRE_MODALES = () => {
   
 }
 
-// Mòdulo Medidores
+
+// Módulo Medidores
 export const MEDIDORES = () => {
   cy.xpath("//span[@class='sidebar_text'][contains(.,'Medidores')]").click({force:true})
 }

@@ -2,7 +2,7 @@ require('cypress-xpath')        // Selector de Xpath
 require('cypress-plugin-tab')   // Tabulacion por comando
 
 const dayjs = require('dayjs')  // Importar fecha
-const { DIMENSIONES, PAGINA_INICIAL, INICIO_SUPERADMIN, INICIO_ADMIN, BUSCAR_COMUNIDAD, CIERRE_MODALES, MEDIDORES, MODULO_CARGOS} = require('../cf_functions');
+const { DIMENSIONES, PAGINA_INICIAL, INICIO_SUPERADMIN, INICIO_ADMIN, BUSCAR_COMUNIDAD, CIERRE_MODALES, MEDIDORES, MODULO_CARGOS, MODAL_NUEVA_FUNCIONALIDAD} = require('../cf_functions');
 
 describe('Smoke Test SC', () => {     
 
@@ -63,7 +63,7 @@ describe('Smoke Test SC', () => {
     //  let curp = '11.111.111-1';
         let nombrePublico = 'Nombre Publico Prueba'
         let correoPublico = 'tc27@cf.cl'
-        let direccion = 'Acapulco, Gro., México'
+        let direccion = 'Monterrey, N.L., México'
 
         // Primera y Segunda Página
         cy.get('#community_name').type(NOMBRE,{force:true})
@@ -75,6 +75,7 @@ describe('Smoke Test SC', () => {
         // País
         cy.get('#community_country_code').select('México',{force:true}).should('have.value','MX')
         cy.get('#autocomplete').type(direccion,{force:true}).tab()
+        cy.get("#community_timezone").select("America/Mexico_City",{force:true}).should('have.value','America/Mexico_City')
         cy.xpath("//input[@type='submit']").click({force:true})
         cy.xpath("//input[@type='submit'][contains(@value,'Guardar')]").click({force:true})
 
@@ -142,18 +143,18 @@ describe('Smoke Test SC', () => {
         let domFiscal = '20928'
         let passCSD = '12345678a'
         let regimen_fiscal = 'Personas Morales con Fines no Lucrativos'
-        let periodicidad = '01 - Diario'
+        let periodicidad = '04 - Mensual'
         let archivo = FACT_SC
         let archivoCer =  FACT_CER_SC
 
         cy.get('#irs-mx_edit_tab').wait(300).click({force:true}).wait(300)
 
-        cy.get('#mx_company_business_name').type(compania,{force:true})
-        cy.get('#mx_company_rfc').type(RFC,{force:true})
-        cy.get('#mx_company_postal_code').type(domFiscal,{force:true})
+        cy.get('#mx_company_business_name').clear().type(compania,{force:true})
+        cy.get('#mx_company_rfc').clear().type(RFC,{force:true})
+        cy.get('#mx_company_postal_code').clear().type(domFiscal,{force:true})
         cy.get('#mx_company_fiscal_regime').select(regimen_fiscal,{force:true}).should('have.value','603')
-        cy.get('#mx_company_periodicity').select(periodicidad,{force:true}).should('have.value','01')
-        cy.get('#mx_company_csd_password').type(passCSD,{force:true})
+        cy.get('#mx_company_periodicity').select(periodicidad,{force:true}).should('have.value','04')
+        cy.get('#mx_company_csd_password').clear().type(passCSD,{force:true})
 
         cy.get('#mx_company_csd_key').should('be.visible').selectFile(archivo,{force:true})
         cy.get('#mx_company_csd_cer').should('be.visible').selectFile(archivoCer,{force:true})
@@ -161,6 +162,198 @@ describe('Smoke Test SC', () => {
         cy.xpath("(//input[@value='Guardar'])[@name='commit'][12]").should('be.visible').click({force:true})
         cy.get("#flash_notice").should('be.visible')
         
+    })
+//*******************************************************************************
+    it('Editar Usuario', () => {
+
+        let aux = 'cypress'
+        INICIO_SUPERADMIN(USER,PASS)
+        BUSCAR_COMUNIDAD(aux);
+
+        // Acceder como SuperAdmin
+        cy.xpath("(//div[@class='btn btn-sm btn-success'][contains(.,'Entrar a comunidad')])[1]").should('be.visible').click({force:true});
+
+        let delay = 300
+        let RFC = 'EKU9003173C9'
+        let domFiscal = '20928'
+        let razonSocial = "Razon Social Cypress"
+
+        // Mi cuenta
+        cy.xpath("(//a[contains(@data-title,'Mi Cuenta')])[1]").click({force:true})
+
+        // Nombre (Primera opción)
+        cy.xpath("(//span[contains(@class,'name')])[1]").click({force:true})
+        // Editar
+        cy.xpath("//button[contains(.,'Editar')]").click({force:true})
+        
+        // País
+        cy.get("#user_country_code").select("México",{force:true}).should('have.value','MX')
+        // RFC
+        //cy.get("#user_identifications_attributes_0_identity").type(RFC,{force:true})
+        // Razón Social
+        cy.get("#user_fiscal_identification_attributes_name").clear().type(razonSocial,{force:true})
+        // Domicilio Fiscal
+        cy.get("#user_fiscal_identification_attributes_postal_code").clear().type(domFiscal,{force:true})
+        // Regimen Fiscal
+        cy.get("#user_fiscal_identification_attributes_fiscal_regime")
+        .select("605 - Sueldos y Salarios e Ingresos Asimilados a Salarios",{force:true})
+        .should('have.value','605')
+        // CFDI
+        cy.get("#user_fiscal_identification_attributes_cfdi_use")
+        .select("S01 - Sin efectos fiscales",{force:true})
+        .should('have.value','S01')
+
+        // Guardar
+        cy.xpath("//input[contains(@value,'Guardar cambios')]").wait(1000).click({force:true}).click({force:true})
+        cy.get("#flash_notice").should("be.visible")
+    })
+//*******************************************************************************
+    it.only('Recaudación (Admin)', () => {
+
+        INICIO_ADMIN(mailAdmin, PASS);
+        CIERRE_MODALES();
+
+        const EXCEL_RECAUDACIONES = 'cypress/e2e/CF/02_archivos/CC/importar_recaudacion.xlsx'
+        const DELAY = 1000
+    
+        const CREAR_PAGOS = (ciclos = 4, duplicados = false) =>{
+
+            // Crear 4 pagos con distintos medios de pago
+            for (let i = 1; i <= ciclos; i++) {
+                    
+                // Módulo Recaudación
+                cy.get("#sidebar-bill").should("be.visible").click({force: true});
+            
+                // Nuevo Pago
+                cy.get("#new_payment").click({force:true})
+
+                // Seleccionar unidad (Primer ciclo es pago no reconocido)
+                cy.get('.multiselect').should("be.visible").click({force:true})
+                
+                if(i == 1){
+                    cy.xpath(`//label[contains(.,'Ninguno')]`).should("be.visible").click({force:true})
+                }else{
+                    cy.xpath(`//label[contains(.,'A${i-1} -')]`).should("be.visible").click({force:true})
+                }
+
+                // Formas de cobro
+                if (i == 1){
+                    cy.get('#payment_payment_type').select('Cheque',{force:true}).should('have.value','cheque');
+                } else if (i == 2){
+                    cy.get('#payment_payment_type').select('Efectivo',{force:true}).should('have.value','cash');
+                } else if (i == 3){
+                    cy.get('#payment_payment_type').select('Transferencia',{force:true}).should('have.value','transference');
+                } else {
+                    cy.get('#payment_payment_type').select('Ajuste',{force:true}).should('have.value','adjustment');
+                }
+
+                // Monto
+                let monto = i + '0000'
+                cy.get('#price_new_payment').should("be.visible").type(monto, {force: true});
+
+                // Crear
+                cy.get('#submit-button').click({force:true})
+
+                // Verificar
+                cy.get('.flash-success').should('be.visible')
+
+                // Verificar alerta de posible pago duplicado
+                if (duplicados == true){
+                    cy.xpath("//span[contains(@id,'flash')]").each(($el) => {
+
+                        const TEXT1 = $el.text()
+                        const RESULTADO = TEXT1.includes('podría estar duplicado')
+                        
+                        if (RESULTADO){
+                            cy.xpath("//span[contains(@id,'flash')]").should('contain','podría estar duplicado').as('alerta_duplicado')
+                        }
+                    })
+                }
+            }
+        }
+
+        // Crear pagos 
+        CREAR_PAGOS()
+    /*
+        // Crear 'x' duplicados y verificar alerta (true)
+        CREAR_PAGOS(2,true)
+
+        // Notificar pagos
+        cy.xpath("(//div[@data-original-title='Notificar pagos'])[1]").click({force:true})
+        cy.xpath("//div[@class='btn btn-success btn-block pull-right'][contains(.,'Notificar')]").click({force:true})
+        cy.get('#flash_notice').should('contain','Notificando comprobantes de pago')
+
+        // Importar recaudaciones
+        cy.get('#dropdown_menu_button_no_period_bills').should('be.visible').click({force:true})
+        cy.xpath("//div[@class='dropdown-item dropdown-option weight-500'][contains(.,'Importar desde Excel')]").click({force:true})
+        cy.get('#excel-file').wait(DELAY).selectFile(EXCEL_RECAUDACIONES,{force:true}).wait(DELAY)
+        cy.get('#excel-upload-submit').click({force:true})
+
+        cy.get('tbody > :nth-child(2) > :nth-child(3)').should('contain','En proceso').wait(5000).reload()
+        cy.get('tbody > :nth-child(2) > :nth-child(3)').should('contain','Importado')
+
+        cy.get("#sidebar-bill").should("be.visible").click({force: true});
+
+    */
+        
+    })
+//*******************************************************************************
+    it.only('Recaudación - Asignación Manual / Facturación', () => {
+        
+        INICIO_ADMIN(mailAdmin, PASS);
+        CIERRE_MODALES();
+
+        let delay = 300
+
+        // Módulo Recaudación
+        cy.get("#sidebar-bill").should("be.visible").click({force: true});
+        
+        for (let i = 1; i <= 3; i++){
+
+            let unidad_nro = 1
+            let monto = i+'00'
+            let descripcion = 'Asignacion manual 0' + i
+            
+            // Ver Unidad 1
+            cy.xpath("(//button[contains(@class,'payment')])[1]").wait(delay).click({force:true})
+            
+            // Fecha
+            cy.xpath(`(//input[contains(@name,'payment[paid_at]')])[${unidad_nro}]`).type(DATE2,{force: true});
+            // Monto
+            cy.xpath(`(//input[contains(@id,'payment_price')])[${unidad_nro}]`).type(monto,{force: true})
+            
+            // Medio
+            if (i == 1){
+                cy.xpath(`(//select[@id='payment_payment_type'])[${unidad_nro}]`).select('Cheque',{force: true}).should('have.value','cheque')
+            } else if (i == 2){
+                cy.xpath(`(//select[@id='payment_payment_type'])[${unidad_nro}]`).wait(delay).select('Efectivo',{force: true}).wait(delay).should('have.value','cash')
+            } else {
+                cy.xpath(`(//select[@id='payment_payment_type'])[${unidad_nro}]`).wait(delay).select('Transferencia',{force: true}).wait(delay).should('have.value','transference')
+            } 
+
+            // Descripcion
+            cy.xpath(`(//input[@id='payment_description'])[${unidad_nro}]`).clear({force:true}).type(descripcion,{force: true})
+            // Guardar
+            cy.xpath(`(//button[@type='submit'])[1]`).should('be.visible').click({force: true}).wait(2000);
+        }
+
+        // Facturar
+        cy.xpath("//div[@class='btn btn-default btn-xs pull-right'][contains(.,'Facturas')]").click({force:true}).wait(2000)
+
+        MODAL_NUEVA_FUNCIONALIDAD()
+
+        cy.xpath("//span[contains(.,'Facturar todo')]").wait(delay).click({force:true}).wait(delay)
+        cy.xpath("//button[@class='btn btn-success'][contains(.,'Facturar todo')]").should('be.visible').click({force:true}).wait(5000)
+
+    /*      Demora demasiado en finalizar internamente los procesos anteriores por lo que no puede cancelar, podemos agregar este codigo mas adelante
+        // Cancelar factura
+        cy.xpath("//a[contains(.,'Facturado')]").should('be.visible').click({force:true}).wait(1000)
+        cy.xpath("(//div[@class='btn btn-xs btn-default btn-cancel'])[1]").click({force:true})
+        cy.get("#cancel-motive-select").wait(delay).select("03 - No se llevó a cabo la operación",{force:true}).should('have.value','03')
+        cy.get("#submit-cancel-form-btn").wait(4000).click({force:true})
+
+        cy.get("#flash_notice").should('be.visible')
+    */
     })
 //*******************************************************************************
     it('Medidores (Admin)', () => {
@@ -203,7 +396,7 @@ describe('Smoke Test SC', () => {
 
     })
 //*******************************************************************************
-    it('Cargos (Admin)', () => {
+    it.only('Cargos (Admin)', () => {
 
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
@@ -291,22 +484,28 @@ describe('Smoke Test SC', () => {
             }
         })
 
-        // Borrar todos los cargos 'Por unidad' (redirectionLimit)
+        // Borrar cargos 'Por unidad' 
         cy.xpath("//a[contains(.,'Por unidad')]").click({force:true})
         cy.get('.multiselect').click({force:true})
         cy.xpath("//label[@class='radio'][contains(.,'Todas las unidades')]").click({force:true})
         cy.xpath("//input[contains(@value,'Buscar')]").click({force:true})
 
+/*      Borrar todos (redirectionLimit)
+
         cy.xpath("(//span[contains(@class,'fa fa-trash-o')])").each(($list) => {
-            
-            for (let k = 1; k <= $list.length; k++){
+            for (let k = 1; k <= $list.length; k++){  // Borrar todos los cargos
                 cy.xpath(`(//span[contains(@class,'fa fa-trash-o')])[1]`).should('be.visible').wait(300).click({force: true})
                 cy.xpath("//div[@class='btn btn-danger'][contains(.,'Eliminar')]").should('be.visible').wait(300).click({force: true}).wait(300)
             }
         })
+*/  
+        for (let k = 1; k <= 3; k++){  // Borrar 3 cargos
+            cy.xpath(`(//span[contains(@class,'fa fa-trash-o')])[1]`).should('be.visible').wait(300).click({force: true})
+            cy.xpath("//div[@class='btn btn-danger'][contains(.,'Eliminar')]").should('be.visible').wait(300).click({force: true}).wait(300)
+        }
     })
 //*******************************************************************************
-    it('Cargos (Admin) - Recargos y Descuentos', () => {
+    it.only('Cargos (Admin) - Recargos y Descuentos', () => {
         
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
@@ -368,93 +567,6 @@ describe('Smoke Test SC', () => {
 
         cy.xpath("//input[@type='submit']").click({force:true})
         cy.get('.flash-success').should('be.visible')   
-    })
-//*******************************************************************************
-    it('Recaudación (Admin)', () => {
-
-        INICIO_ADMIN(mailAdmin, PASS);
-        CIERRE_MODALES();
-
-        const EXCEL_RECAUDACIONES = 'cypress/e2e/CF/02_archivos/CC/importar_recaudacion.xlsx'
-        const DELAY = 1000
-      
-        const CREAR_PAGOS = (ciclos = 4, duplicados = false) =>{
-
-            // Crear 4 pagos con distintos medios de pago
-            for (let i = 1; i <= ciclos; i++) {
-                    
-                // Módulo Recaudación
-                cy.get("#sidebar-bill").should("be.visible").click({force: true});
-            
-                // Nuevo Pago
-                cy.get("#new_payment").click({force:true})
-
-                // Seleccionar unidad (Primer ciclo es pago no reconocido)
-                cy.get('.multiselect').should("be.visible").click({force:true})
-                
-                if(i == 1){
-                    cy.xpath(`//label[contains(.,'Ninguno')]`).should("be.visible").click({force:true})
-                }else{
-                    cy.xpath(`//label[contains(.,'A${i-1} -')]`).should("be.visible").click({force:true})
-                }
-
-                // Formas de cobro
-                if (i == 1){
-                    cy.get('#payment_payment_type').select('Cheque',{force:true}).should('have.value','cheque');
-                } else if (i == 2){
-                    cy.get('#payment_payment_type').select('Efectivo',{force:true}).should('have.value','cash');
-                } else if (i == 3){
-                    cy.get('#payment_payment_type').select('Transferencia',{force:true}).should('have.value','transference');
-                } else {
-                    cy.get('#payment_payment_type').select('Ajuste',{force:true}).should('have.value','adjustment');
-                }
-
-                // Monto
-                let monto = i + '0000'
-                cy.get('#price_new_payment').should("be.visible").type(monto, {force: true});
-
-                // Crear
-                cy.get('#submit-button').click({force:true})
-
-                // Verificar
-                cy.get('.flash-success').should('be.visible')
-
-                // Verificar alerta de posible pago duplicado
-                if (duplicados == true){
-                    cy.xpath("//span[contains(@id,'flash')]").each(($el) => {
-
-                        const TEXT1 = $el.text()
-                        const RESULTADO = TEXT1.includes('podría estar duplicado')
-                        
-                        if (RESULTADO){
-                            cy.xpath("//span[contains(@id,'flash')]").should('contain','podría estar duplicado').as('alerta_duplicado')
-                        }
-                    })
-                }
-            }
-        }
-
-        // Crear pagos 
-        CREAR_PAGOS()
-
-        // Crear 'x' duplicados y verificar alerta (true)
-        CREAR_PAGOS(2,true)
-
-        // Notificar pagos
-        cy.xpath("(//div[@data-original-title='Notificar pagos'])[1]").click({force:true})
-        cy.xpath("//div[@class='btn btn-success btn-block pull-right'][contains(.,'Notificar')]").click({force:true})
-        cy.get('#flash_notice').should('contain','Notificando comprobantes de pago')
-
-        // Importar recaudaciones
-        cy.get('#dropdown_menu_button_no_period_bills').should('be.visible').click({force:true})
-        cy.xpath("//div[@class='dropdown-item dropdown-option weight-500'][contains(.,'Importar desde Excel')]").click({force:true})
-        cy.get('#excel-file').wait(DELAY).selectFile(EXCEL_RECAUDACIONES,{force:true}).wait(DELAY)
-        cy.get('#excel-upload-submit').click({force:true})
-
-        cy.get('tbody > :nth-child(2) > :nth-child(3)').should('contain','En proceso').wait(2000).reload()
-        cy.get('tbody > :nth-child(2) > :nth-child(3)').should('contain','Importado')
-
-        cy.get("#sidebar-bill").should("be.visible").click({force: true});
     })
 //*******************************************************************************
     it('Egresos (Admin)', () => {  
@@ -519,6 +631,11 @@ describe('Smoke Test SC', () => {
 //*******************************************************************************
     it('Condóminos (Admin)', () => {
         
+        let domFiscal = '20928'
+        let RFC = 'EKU9003173C9'
+        let passCSD = '12345678a'
+        let regimen_fiscal = 'Personas Morales con Fines no Lucrativos'
+
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
 
@@ -532,6 +649,11 @@ describe('Smoke Test SC', () => {
 
         cy.get("#user_first_name").type(nombreRes,{force:true})
         cy.get("#user_last_name").type(apellidoRes,{force:true})
+
+        cy.get("#user_fiscal_identification_attributes_postal_code").clear({force:true}).type(domFiscal,{force:true})
+        cy.get("#user_fiscal_identification_attributes_fiscal_regime").select("605 - Sueldos y Salarios e Ingresos Asimilados a Salarios",{force:true}).should("have.value","605")
+        cy.get("#user_fiscal_identification_attributes_cfdi_use").select("S01 - Sin efectos fiscales",{force:true}).should("have.value","S01")
+        cy.get("#user_identifications_attributes_0_identity").clear({force:true}).type(RFC,{force:true})
 
         let unidad = 'A17'
         let rol = 'Arrendatario' // lessee
@@ -551,6 +673,31 @@ describe('Smoke Test SC', () => {
         cy.get('#community_notify').click({force:true})
         cy.xpath("//input[contains(@type,'submit')]").click({force:true})
         cy.get('.flash-success').should('be.visible')
+
+    })
+//*******************************************************************************
+    it('Recaudación - Anular Facturas', () => {
+        
+        INICIO_ADMIN(mailAdmin, PASS);
+        CIERRE_MODALES();
+
+        let delay = 300
+        
+        // Módulo Recaudación
+        cy.get("#sidebar-bill").should("be.visible").click({force: true});
+
+        // Facturar
+        cy.xpath("//div[@class='btn btn-default btn-xs pull-right'][contains(.,'Facturas')]").click({force:true}).wait(2000)
+
+        MODAL_NUEVA_FUNCIONALIDAD()
+
+        // Cancelar factura
+        cy.xpath("//a[contains(.,'Facturado')]").should('be.visible').click({force:true}).wait(1000)
+        cy.xpath("(//div[@class='btn btn-xs btn-default btn-cancel'])[1]").click({force:true})
+        cy.get("#cancel-motive-select").wait(delay).select("03 - No se llevó a cabo la operación",{force:true}).should('have.value','03')
+        cy.get("#submit-cancel-form-btn").wait(4000).click({force:true})
+
+        cy.get("#flash_notice").should('be.visible')
 
     })
 //*******************************************************************************
