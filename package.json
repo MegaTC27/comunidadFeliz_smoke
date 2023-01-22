@@ -17,5 +17,13 @@
   "dependencies": {
     "cypress-real-events": "^1.7.4"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MegaTC27/comunidadFeliz_smoke.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MegaTC27/comunidadFeliz_smoke/issues"
+  },
+  "homepage": "https://github.com/MegaTC27/comunidadFeliz_smoke#readme",
   "description": ""
 }
