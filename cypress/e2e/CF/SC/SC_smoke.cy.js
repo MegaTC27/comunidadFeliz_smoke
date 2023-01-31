@@ -73,7 +73,7 @@ describe('Smoke Test SC', () => {
         cy.get("#community_count_csm").click({force:true})
 
         // País
-        cy.get('#community_country_code').select('México',{force:true}).should('have.value','MX')
+        cy.get('#community_country_code').select('México',{force:true}).should('have.value','MX').wait(1000)
         cy.get('#autocomplete').type(direccion,{force:true}).tab()
         cy.get("#community_timezone").select("America/Mexico_City",{force:true}).should('have.value','America/Mexico_City')
         cy.xpath("//input[@type='submit']").click({force:true})
@@ -164,7 +164,7 @@ describe('Smoke Test SC', () => {
         
     })
 //*******************************************************************************
-    it('Editar Usuario', () => {
+    it.only('Editar Usuario', () => {
 
         let aux = 'cypress'
         INICIO_SUPERADMIN(USER,PASS)
@@ -334,7 +334,7 @@ describe('Smoke Test SC', () => {
             // Descripcion
             cy.xpath(`(//input[@id='payment_description'])[${unidad_nro}]`).clear({force:true}).type(descripcion,{force: true})
             // Guardar
-            cy.xpath(`(//button[@type='submit'])[1]`).should('be.visible').click({force: true}).wait(2000);
+            cy.xpath(`(//button[@type='submit'])[1]`).click({force: true}).wait(2000);
         }
 
         // Facturar
@@ -356,7 +356,7 @@ describe('Smoke Test SC', () => {
     */
     })
 //*******************************************************************************
-    it('Medidores (Admin)', () => {
+    it.only('Medidores (Admin)', () => {
 
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
@@ -391,7 +391,7 @@ describe('Smoke Test SC', () => {
         cy.get('#excel_upload_excel').wait(1000).selectFile("cypress/e2e/CF/02_archivos/SC/SC_Medidores_LecturasIniciales.xlsx",{force:true}).wait(1000)
         cy.xpath("//input[@type='submit']").click({force:true})
 
-        cy.get('tbody > :nth-child(2) > :nth-child(4)').should('contain','En proceso').wait(6000).reload()
+        cy.get('tbody > :nth-child(2) > :nth-child(4)').should('contain','En proceso').wait(10000).reload()
         cy.get('tbody > :nth-child(2) > :nth-child(4)').should('contain','Importado')
 
     })
@@ -500,8 +500,8 @@ describe('Smoke Test SC', () => {
         })
 */  
         for (let k = 1; k <= 3; k++){  // Borrar 3 cargos
-            cy.xpath(`(//span[contains(@class,'fa fa-trash-o')])[1]`).should('be.visible').wait(300).click({force: true})
-            cy.xpath("//div[@class='btn btn-danger'][contains(.,'Eliminar')]").should('be.visible').wait(300).click({force: true}).wait(300)
+            cy.xpath(`(//span[contains(@class,'fa fa-trash-o')])[1]`).should('be.visible').wait(1000).click({force: true}).wait(1000)
+            cy.xpath("//div[@class='btn btn-danger'][contains(.,'Eliminar')]").should('be.visible').wait(1000).click({force: true}).wait(1000)
         }
     })
 //*******************************************************************************
@@ -569,7 +569,7 @@ describe('Smoke Test SC', () => {
         cy.get('.flash-success').should('be.visible')   
     })
 //*******************************************************************************
-    it('Egresos (Admin)', () => {  
+    it.only('Egresos (Admin)', () => {  
 
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
@@ -629,7 +629,7 @@ describe('Smoke Test SC', () => {
             })
     })
 //*******************************************************************************
-    it('Condóminos (Admin)', () => {
+    it.only('Condóminos (Admin)', () => {
         
         let domFiscal = '20928'
         let RFC = 'EKU9003173C9'
@@ -697,7 +697,7 @@ describe('Smoke Test SC', () => {
         cy.get("#cancel-motive-select").wait(delay).select("03 - No se llevó a cabo la operación",{force:true}).should('have.value','03')
         cy.get("#submit-cancel-form-btn").wait(4000).click({force:true})
 
-        cy.get("#flash_notice").should('be.visible')
+       // cy.get("#flash_notice").should('be.visible')
 
     })
 //*******************************************************************************

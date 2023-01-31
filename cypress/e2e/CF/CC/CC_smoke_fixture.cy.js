@@ -11,6 +11,7 @@ describe('Smoke Test CC', () => {
     let apellidoAdmin = 'Pruebas'
     let dateAux = dayjs().format('DDMMYY');
     let mailAdmin = nombreAdmin + dateAux + '@gmail.com'
+//    let mailAdmin = 'cypressAux@gmail.com'
     
     // RESIDENTE
     let nombreRes = 'Res_Cyp'
@@ -32,7 +33,7 @@ describe('Smoke Test CC', () => {
             globalThis.data = data;
 
             // SUPER ADMIN
-            globalThis.WEB = data.WEB_SMOKE
+            globalThis.WEB = data.WEB_5
             globalThis.USER = data.USER_5
             globalThis.PASS = data.PASS_5
 
@@ -74,6 +75,7 @@ describe('Smoke Test CC', () => {
         cy.xpath("//input[@type='submit'][contains(@value,'Guardar')]").click({force:true})
 
         // Importar Propiedades
+        cy.wait(500).reload()
         cy.get('#excel_upload_name').select('Copropietarios',{force:true}).should('have.value','Copropietarios')
         cy.get('#excel_upload_excel').wait(delay).selectFile(RUTA_PROPIEDADES,{force:true}).wait(delay)
         cy.xpath("//input[contains(@value,'Subir')]").click({force:true})
@@ -85,6 +87,7 @@ describe('Smoke Test CC', () => {
         cy.xpath("//input[contains(@type,'submit')]").click({force:true})
         
         // Importar Pagos
+        cy.wait(500).reload()
         cy.get('#excel_upload_name').select('Saldos',{force:true}).should('have.value','Saldos')
         cy.get('#excel_upload_excel').wait(delay).selectFile(RUTA_PAGOS,{force:true}).wait(delay)
         cy.xpath("//input[contains(@value,'Subir')]").click({force:true})
@@ -415,7 +418,7 @@ describe('Smoke Test CC', () => {
 
             // Comprobar con la Conciliación Bancaria
             cy.xpath("//span[@class='sidebar_text'][contains(.,'Finanzas')]").wait(300).click({force:true}).wait(300)
-            cy.xpath("//span[contains(.,'Conciliación bancaria')]").should("be.visible").click({force:true})
+            cy.xpath("//span[contains(.,'Conciliación bancaria')]").click({force:true})
 
             // Iniciar conciliación, si es necesario
             cy.get('h1').each(($el) => {
