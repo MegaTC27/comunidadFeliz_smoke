@@ -7,7 +7,7 @@ const { DIMENSIONES, PAGINA_INICIAL, INICIO_SUPERADMIN, INICIO_ADMIN, BUSCAR_COM
 describe('WebPay CC (Web 1)', () => {     
  
     // SUPER ADMIN
-    const WEB = Cypress.env('WEB_SMOKE');
+    const WEB = Cypress.env('WEB_5');
     const USER = Cypress.env('USER_5');
     const PASS = Cypress.env('PASS_5');
 
@@ -166,7 +166,7 @@ describe('WebPay CC (Web 1)', () => {
         cy.xpath("//input[@type='submit']").click({force:true})
     })
 //*******************************************************************************
-    it.only('Inicio Residente', () => {
+    it.only('Residente - Pago WebPay', () => {
 
         const AUX_MAIL = 'Cypress_231222_155314@gmail.com' 
         const DELAY = 500;
@@ -191,6 +191,9 @@ describe('WebPay CC (Web 1)', () => {
 
         cy.get('#submit-button').should('be.visible').click({force:true}).wait(1000)
 
+        // Confirmar pago
+        cy.xpath("//button[contains(.,'Confirmar Pago')]").click({force:true})
+        
         // Aceptar Modal de Términos y condiciones 
         RES_TERMINOS_CONDICIONES() 
 
@@ -201,6 +204,62 @@ describe('WebPay CC (Web 1)', () => {
         cy.get('#card-exp').clear().type(EXP_TARJETA,{force:true}).wait(DELAY)
         cy.get('#card-cvv').clear().type(CVV,{force:true}).wait(DELAY)
         //cy.get('.alert__terms > span').click({force:true}).wait(DELAY)    //  PARA EL OTRO MEDIO DE PAGO
+
+        cy.get('.submit').should('be.visible').click({force:true})
+
+        // Transbank
+        cy.get('#rutClient').clear().type(RUT_TRANSBANK,{force:true})
+        cy.get('#passwordClient').clear().type(PASS_TRANSBANK,{force:true})
+        cy.xpath("//input[@value='Aceptar']").click({force:true})
+
+        cy.get("#vci").select("Aceptar",{force:true}).should('have.value','TSY')
+
+        cy.xpath("//input[@type='submit']").click({force:true}).wait(3000)
+
+        // Verificar Pago
+        cy.get('.title-container').contains('¡Tu pago fue realizado con éxito!').should('be.visible')
+        cy.xpath("//div[@class='btn btn-default btn-xs pull-right hidden-xs'][contains(.,'Volver')]").click({force:true}).wait(DELAY)
+        cy.get('.btn-link').click({force:true}).wait(DELAY)
+    })
+//*******************************************************************************
+    it('Residente - Pago WebPay OneClick', () => {
+
+        const AUX_MAIL = 'Cypress_231222_155314@gmail.com' 
+        const DELAY = 500;
+
+        INICIO_SUPERADMIN(mailRes,PASS)
+        RES_CIERRE_MODALES()
+
+        // Pagar en Linea
+        cy.xpath("//input[contains(@value,'Pagar en línea')]").click({force:true}).wait(DELAY)
+
+        // Pagar $100 
+        const MONTO_PAGAR = 100
+
+        cy.get('#in_full_false').click({force:true}).wait(DELAY)
+        cy.get('#amount').type(MONTO_PAGAR,{force:true})
+        
+        // Seleccionar WebPayPlus
+        cy.xpath("//div[contains(@data-info,'WebpayOneClick')]").click({force:true}).wait(DELAY).click({force:true})
+        
+        // Checkbox Términos y condiciones
+        cy.get('#terms_and_conditions').click({force:true})
+
+        cy.get('#submit-button').should('be.visible').click({force:true}).wait(1000)
+
+        // Confirmar pago
+        cy.xpath("//button[contains(.,'Confirmar Pago')]").click({force:true})
+        
+        // Aceptar Modal de Términos y condiciones 
+        RES_TERMINOS_CONDICIONES() 
+
+        // Seleccionar Credito
+        cy.xpath("//button[contains(.,'Crédito')]").click({force:true}).wait(DELAY)
+
+        cy.get('#card-number').clear().type(NRO_TARJETA,{force:true}).wait(DELAY)
+        cy.get('#card-exp').clear().type(EXP_TARJETA,{force:true}).wait(DELAY)
+        cy.get('#card-cvv').clear().type(CVV,{force:true}).wait(DELAY)
+        cy.get('.alert__terms > span').click({force:true}).wait(DELAY)    //  PARA EL OTRO MEDIO DE PAGO
 
         cy.get('.submit').should('be.visible').click({force:true})
 
