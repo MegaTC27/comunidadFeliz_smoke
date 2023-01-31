@@ -15,7 +15,7 @@ pipeline {
                         git url: 'https://github.com/MegaTC27/comunidadFeliz_smoke.git'
                         bat 'npm install cypress --save-dev'
                         bat 'npm update'                       
-                        bat 'npx cypress run --record --key 1893406c-ed6a-40ed-b6a5-ae03f154ab69 --parallel'
+                        bat 'npx cypress run --record --key 380cb462-a4c0-4748-b2d5-8fa1d53b31cb --parallel'
                     
                     }
                 }
@@ -28,7 +28,7 @@ pipeline {
                         git url: 'https://github.com/MegaTC27/comunidadFeliz_smoke.git'
                         bat 'npm install cypress --save-dev'
                         bat 'npm update'                       
-                        bat 'npx cypress run --record --key 1893406c-ed6a-40ed-b6a5-ae03f154ab69 --parallel'
+                        bat 'npx cypress run --record --key 380cb462-a4c0-4748-b2d5-8fa1d53b31cb --parallel'
                     
                     }
                 }
