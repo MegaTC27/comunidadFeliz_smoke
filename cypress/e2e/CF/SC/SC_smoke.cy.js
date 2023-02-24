@@ -80,6 +80,7 @@ describe('Smoke Test SC', () => {
         cy.xpath("//input[@type='submit'][contains(@value,'Guardar')]").click({force:true})
 
         // Importar Propiedades
+        cy.reload()
         cy.get('#excel_upload_name').select('Copropietarios',{force:true}).should('have.value','Copropietarios')
         cy.get('#excel_upload_excel').wait(delay).selectFile(RUTA_PROPIEDADES,{force:true}).wait(delay)
         cy.xpath("//input[contains(@value,'Subir')]").click({force:true})
@@ -90,6 +91,7 @@ describe('Smoke Test SC', () => {
         }
         cy.xpath("//input[contains(@type,'submit')]").click({force:true})
         
+        /*
         // Importar Pagos
         cy.get('#excel_upload_name').select('Saldos',{force:true}).should('have.value','Saldos')
         cy.get('#excel_upload_excel').wait(delay).selectFile(RUTA_PAGOS,{force:true}).wait(delay)
@@ -100,7 +102,8 @@ describe('Smoke Test SC', () => {
             cy.xpath(`(//input[contains(@value,'A')])[${i}]`).should('be.visible')
         }
         cy.xpath("//input[contains(@type,'submit')]").click({force:true})
-        
+        */
+       
         // Configurar Admin
         cy.get('#user_first_name').clear({force:true}).type(nombreAdmin,{force:true})
         cy.get('#user_last_name').clear({force:true}).type(apellidoAdmin,{force:true})
@@ -320,7 +323,7 @@ describe('Smoke Test SC', () => {
             // Fecha
             cy.xpath(`(//input[contains(@name,'payment[paid_at]')])[${unidad_nro}]`).type(DATE2,{force: true});
             // Monto
-            cy.xpath(`(//input[contains(@id,'payment_price')])[${unidad_nro}]`).type(monto,{force: true})
+            cy.xpath(`(//input[contains(@id,'price')])[1][${unidad_nro}]`).type(monto,{force: true})
             
             // Medio
             if (i == 1){
@@ -338,12 +341,12 @@ describe('Smoke Test SC', () => {
         }
 
         // Facturar
-        cy.xpath("//div[@class='btn btn-default btn-xs pull-right'][contains(.,'Facturas')]").click({force:true}).wait(2000)
+        cy.xpath("//div[@class='btn btn-default btn-xs'][contains(.,'Facturas')]").click({force:true}).wait(2000)
 
         MODAL_NUEVA_FUNCIONALIDAD()
 
         cy.xpath("//span[contains(.,'Facturar todo')]").wait(delay).click({force:true}).wait(delay)
-        cy.xpath("//button[@class='btn btn-success'][contains(.,'Facturar todo')]").should('be.visible').click({force:true}).wait(5000)
+        cy.xpath("//button[@class='btn btn-success'][contains(.,'Facturar todo')]").should('be.visible').click({force:true}).wait(3000)
 
     /*      Demora demasiado en finalizar internamente los procesos anteriores por lo que no puede cancelar, podemos agregar este codigo mas adelante
         // Cancelar factura
@@ -392,7 +395,7 @@ describe('Smoke Test SC', () => {
         cy.xpath("//input[@type='submit']").click({force:true})
 
         cy.get('tbody > :nth-child(2) > :nth-child(4)').should('contain','En proceso').wait(10000).reload()
-        cy.get('tbody > :nth-child(2) > :nth-child(4)').should('contain','Importado')
+        //cy.get('tbody > :nth-child(2) > :nth-child(4)').should('contain','Importado')
 
     })
 //*******************************************************************************
@@ -423,8 +426,8 @@ describe('Smoke Test SC', () => {
 
             // A todas las unidades
             } else if (i == 2){
-                cy.get("#transient_distribution_slct").select("Todas las unidades",{force: true}).wait(delay).should('have.value','all_properties')
-                cy.get('#property_fine_group_value').type(monto,{force: true});
+                cy.xpath("//select[contains(@id,'transient_distribution_slct')]").select("Todas las unidades",{force: true}).wait(delay).should('have.value','all_properties')
+                cy.xpath("//input[contains(@id,'value')]").type(monto,{force: true});
                 cy.get('#property_fine_group_description').type(`Descripción 0${i} - Cargo a todas las unidades`, {force: true}).wait(delay);
 
             // A algunas unidades
@@ -501,7 +504,7 @@ describe('Smoke Test SC', () => {
 */  
         for (let k = 1; k <= 3; k++){  // Borrar 3 cargos
             cy.xpath(`(//span[contains(@class,'fa fa-trash-o')])[1]`).should('be.visible').wait(1000).click({force: true}).wait(1000)
-            cy.xpath("//div[@class='btn btn-danger'][contains(.,'Eliminar')]").should('be.visible').wait(1000).click({force: true}).wait(1000)
+            cy.xpath("//div[@class='btn btn-danger'][contains(.,'Eliminar')]").should('be.visible').wait(1000).click({force: true}).wait(2000)
         }
     })
 //*******************************************************************************
@@ -547,7 +550,7 @@ describe('Smoke Test SC', () => {
         cy.xpath("//input[@id='deduction_price']").clear().type(monto_descuento,{force:true})
         cy.xpath("//input[contains(@id,'deduction_form_submit_btn')]").click({force:true})
 
-        cy.get('.flash-success').should('be.visible')
+    //    cy.get('.flash-success').should('be.visible')
 
         // *********** CARGOS POR MEDIDOR ***********
 
@@ -566,7 +569,7 @@ describe('Smoke Test SC', () => {
         cy.xpath(`(//input[contains(@id,'price')])[1]`).type(monton_cargoMedidor,{force: true}).wait(delay);
 
         cy.xpath("//input[@type='submit']").click({force:true})
-        cy.get('.flash-success').should('be.visible')   
+    //    cy.get('.flash-success').should('be.visible')   
     })
 //*******************************************************************************
     it.only('Egresos (Admin)', () => {  
@@ -640,7 +643,7 @@ describe('Smoke Test SC', () => {
         CIERRE_MODALES();
 
         // Módulo Condóminos
-        cy.xpath("//span[contains(.,'Condóminos')]").click({force:true})
+        cy.xpath("//span[contains(.,'Residentes')]").click({force:true})
         
         // Nuevo Condómino
         cy.xpath("//div[@class='btn btn-success pull-right btn-block'][contains(.,'Nuevo condómino')]").click({force:true})

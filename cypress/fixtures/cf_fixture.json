@@ -1,19 +1,27 @@
 {
   "WEB_1": "https://test1.comunidadfeliz.com/",
   "USER_1":"mauricio.alfaro@comunidadfeliz.cl",
-  "PASS_1": "feliz21.",
+  "PASS_1": "feliz23.",
+
+  "WEB_2": "https://test2.comunidadfeliz.com/",
+  "USER_2":"juan.treppo@comunidadfeliz.cl",
+  "PASS_2": "feliz23.",
+
+  "WEB_3": "https://test3.comunidadfeliz.com/",
+  "USER_3":"juan.treppo@comunidadfeliz.cl",
+  "PASS_3": "feliz23.",
 
   "WEB_4": "https://test4.comunidadfeliz.com/",
   "USER_4":"juan.treppo@comunidadfeliz.cl",
-  "PASS_4": "feliz21.",
+  "PASS_4": "feliz23.",
 
   "WEB_5": "https://test5.comunidadfeliz.com/",
   "USER_5":"juan.treppo@comunidadfeliz.cl",
-  "PASS_5": "feliz21.",
+  "PASS_5": "feliz23.",
 
   "WEB_SMOKE": "https://smoke.comunidadfeliz.com/",
 
-    
+  
   "RUTA_EXCEL_PROPIEDADES_CC": "cypress/e2e/CF/02_archivos/CC/PropiedadestipoCasaFunk.xlsx",
   "RUTA_EXCEL_PAGOS_CC": "cypress/e2e/CF/02_archivos/CC/SaldosTipoCasaFunk.xlsx",
 

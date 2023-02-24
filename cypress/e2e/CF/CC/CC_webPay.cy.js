@@ -6,11 +6,6 @@ const { DIMENSIONES, PAGINA_INICIAL, INICIO_SUPERADMIN, INICIO_ADMIN, BUSCAR_COM
 
 describe('WebPay CC (Web 1)', () => {     
  
-    // SUPER ADMIN
-    const WEB = Cypress.env('WEB_5');
-    const USER = Cypress.env('USER_5');
-    const PASS = Cypress.env('PASS_5');
-
     // ADMIN
     let nombreAdmin = 'Cypress'
     let apellidoAdmin = 'Pruebas'
@@ -39,6 +34,21 @@ describe('WebPay CC (Web 1)', () => {
     const RUTA_PAGOS = Cypress.env("RUTA_EXCEL_PAGOS_CC")
 
     // TEST CASES
+
+    before(()=>{
+        cy.fixture('cf_fixture').then(data => {
+            globalThis.data = data;
+
+            // SUPER ADMIN
+            globalThis.WEB = data.WEB_4
+            globalThis.USER = data.USER_5
+            globalThis.PASS = data.PASS_5
+
+            // EXCEL
+            globalThis.RUTA_PROPIEDADES = data.RUTA_EXCEL_PROPIEDADES_CC
+            globalThis.RUTA_PAGOS = data.RUTA_EXCEL_PAGOS_CC
+        })
+    })
 
     beforeEach(() => {
       DIMENSIONES();
@@ -70,6 +80,7 @@ describe('WebPay CC (Web 1)', () => {
         cy.xpath("//input[@type='submit'][contains(@value,'Guardar')]").click({force:true})
 
         // Importar Propiedades
+        cy.reload()
         cy.get('#excel_upload_name').select('Copropietarios',{force:true}).should('have.value','Copropietarios')
         cy.get('#excel_upload_excel').wait(delay).selectFile(RUTA_PROPIEDADES,{force:true}).wait(delay)
         cy.xpath("//input[contains(@value,'Subir')]").click({force:true})
@@ -80,6 +91,12 @@ describe('WebPay CC (Web 1)', () => {
         }
         cy.xpath("//input[contains(@type,'submit')]").click({force:true})
         
+        // Otorgar permisos 
+        cy.wait(500).reload()
+        cy.get('.round').click({force:true})
+        cy.xpath("//span[contains(@id,'notice')][contains(.,'Permisos otorgados exitosamente. Ahora tienes permisos temporales en esta comunidad')]").should('be.visible')
+        cy.xpath("//a[contains(@data-title,'Actualmente cuentas con permisos en este módulo')]").should('be.visible')
+       
         // Importar Pagos
         cy.get('#excel_upload_name').select('Saldos',{force:true}).should('have.value','Saldos')
         cy.get('#excel_upload_excel').wait(delay).selectFile(RUTA_PAGOS,{force:true}).wait(delay)
@@ -149,17 +166,17 @@ describe('WebPay CC (Web 1)', () => {
         // Copropietario
 
         cy.xpath("//a[@href='/copropietarios']").should('be.visible').click({force:true})
-        cy.xpath("//div[contains(@data-intro,'Agregar nuevo copropietario.')]").should('be.visible').click({force:true})
+        cy.xpath("//div[contains(@data-intro,'Agregar nuevo residente')]").should('be.visible').click({force:true})
 
         // Crear Residente
         cy.get('#search_email').type(mailRes,{force:true})
         cy.get('#search_email_btn').click({force:true})
 
         cy.get('#user_first_name').type(nombreRes,{force:true})
-        cy.get('#user_last_name').type(apellidoRes,{force:true})
+        cy.get('#user_last_name').type(apellidoRes,{force:true}).wait(1000)
 
-        cy.get('#property_user_save_btn').click({force:true})
-
+        cy.get('#property_user_save_btn').click({force:true}).wait(1000).reload()
+       
         // Cambiar clave
         cy.xpath("//div[contains(@data-intro,'Configurar claves de acceso')]").click({force:true})
         cy.get('#new_password').clear().type(PASS,{force:true})

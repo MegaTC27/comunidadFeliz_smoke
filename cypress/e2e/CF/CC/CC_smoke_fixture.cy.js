@@ -64,6 +64,8 @@ describe('Smoke Test CC', () => {
 
         // Primera y Segunda Página
         cy.get('#community_name').type(NOMBRE,{force:true})
+        //cy.get('#community_name').type('SC CYPRESS - RES',{force:true})
+
         cy.get('#community_identifications_attributes_0_identity').type(rut,{force:true})
         cy.get('#community_contact_name').type(nombrePublico,{force:true})
         cy.get('#community_contact_email').type(correoPublico,{force:true})
@@ -73,6 +75,12 @@ describe('Smoke Test CC', () => {
         cy.get('#autocomplete').type(direccion,{force:true}).tab()
         cy.xpath("//input[@type='submit']").click({force:true})
         cy.xpath("//input[@type='submit'][contains(@value,'Guardar')]").click({force:true})
+
+        // Otorgar permisos 
+        cy.wait(500).reload()
+        cy.get('.round').click({force:true})
+        cy.xpath("//span[contains(@id,'notice')][contains(.,'Permisos otorgados exitosamente. Ahora tienes permisos temporales en esta comunidad')]").should('be.visible')
+        cy.xpath("//a[contains(@data-title,'Actualmente cuentas con permisos en este módulo')]").should('be.visible')
 
         // Importar Propiedades
         cy.wait(500).reload()
@@ -123,6 +131,7 @@ describe('Smoke Test CC', () => {
         
         // Con Control de Periodo
         cy.xpath("//label[contains(.,'La comunidad trabaja con Control por Período')]/following-sibling::select").select('Sí',{force:true}).should('have.value','0')
+        //cy.xpath("//label[contains(.,'La comunidad trabaja con Control por Período')]/following-sibling::select").select('No',{force:true}).should('have.value','1')
 
         // Remuneraciones
         cy.xpath("//label[text()='Remuneraciones']/following-sibling::select").select('Activado',{force:true}).should('have.value','1')
@@ -211,10 +220,10 @@ describe('Smoke Test CC', () => {
 
         // Importar recaudaciones
         cy.get('#bills-import-excel-btn').click({force:true})
-        cy.get('#excel-file').wait(DELAY).selectFile(EXCEL_RECAUDACIONES,{force:true}).wait(DELAY)
-        cy.get('#excel-upload-submit').click({force:true})
+        cy.get('#excel-file').wait(DELAY).selectFile(EXCEL_RECAUDACIONES,{force:true}).wait(3000)
+        cy.get('#excel-upload-submit').click({force:true}).reload()
 
-        cy.get('tbody > :nth-child(2) > :nth-child(3)').should('contain','En proceso').wait(5000).reload()
+        cy.get('tbody > :nth-child(2) > :nth-child(3)').should('contain','En proceso').wait(10000).reload()
         cy.get('tbody > :nth-child(2) > :nth-child(3)').should('contain','Importado')
 
         cy.get("#sidebar-bill").should("be.visible").click({force: true});
@@ -481,7 +490,7 @@ describe('Smoke Test CC', () => {
         
         cy.xpath("//input[@value='Finalizar gastos comunes']").should('be.visible').click({force:true})
 
-        cy.get("#submit_button").should('be.visible').wait(1000).click({force:true})
+        cy.get("#submit_button").wait(1000).click({force:true})
         cy.get('#confirm_button').click({force:true})
         
         cy.get('#confirm_password_password').type(PASS,{force:true})
@@ -501,15 +510,15 @@ describe('Smoke Test CC', () => {
     })
     })
 //*******************************************************************************
-    it.only('Copropietarios (Admin)', () => {
+    it.only('Residentes (Admin)', () => {
         
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
 
-        // Módulo Copropietarios2
+        // Módulo Residentes
         cy.xpath("//span[contains(.,'Copropietarios')]").click({force:true})
         
-        // Nuevo Condómino
+        // Nuevo Residente
         cy.xpath("//div[@class='btn btn-success pull-right btn-block'][contains(.,'Nuevo copropietario')]").click({force:true})
         cy.get("#search_email").type(mailRes,{force:true})
         cy.get('#search_email_btn').click({force:true})
