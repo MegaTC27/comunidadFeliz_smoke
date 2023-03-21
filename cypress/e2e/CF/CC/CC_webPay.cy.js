@@ -40,7 +40,7 @@ describe('WebPay CC (Web 1)', () => {
             globalThis.data = data;
 
             // SUPER ADMIN
-            globalThis.WEB = data.WEB_4
+            globalThis.WEB = data.WEB_5
             globalThis.USER = data.USER_5
             globalThis.PASS = data.PASS_5
 
@@ -79,6 +79,12 @@ describe('WebPay CC (Web 1)', () => {
         cy.xpath("//input[@type='submit']").click({force:true})
         cy.xpath("//input[@type='submit'][contains(@value,'Guardar')]").click({force:true})
 
+        // Otorgar permisos 
+        cy.wait(500).reload()
+        cy.get('.round').click({force:true})
+        cy.xpath("//span[contains(@id,'notice')][contains(.,'Permisos otorgados exitosamente. Ahora tienes permisos temporales en esta comunidad')]").should('be.visible')
+        cy.xpath("//a[contains(@data-title,'Actualmente cuentas con permisos en este módulo')]").should('be.visible')
+
         // Importar Propiedades
         cy.reload()
         cy.get('#excel_upload_name').select('Copropietarios',{force:true}).should('have.value','Copropietarios')
@@ -90,13 +96,7 @@ describe('WebPay CC (Web 1)', () => {
             cy.xpath(`(//td[contains(.,'A${i}')])[1]`).should('be.visible')
         }
         cy.xpath("//input[contains(@type,'submit')]").click({force:true})
-        
-        // Otorgar permisos 
-        cy.wait(500).reload()
-        cy.get('.round').click({force:true})
-        cy.xpath("//span[contains(@id,'notice')][contains(.,'Permisos otorgados exitosamente. Ahora tienes permisos temporales en esta comunidad')]").should('be.visible')
-        cy.xpath("//a[contains(@data-title,'Actualmente cuentas con permisos en este módulo')]").should('be.visible')
-       
+   
         // Importar Pagos
         cy.get('#excel_upload_name').select('Saldos',{force:true}).should('have.value','Saldos')
         cy.get('#excel_upload_excel').wait(delay).selectFile(RUTA_PAGOS,{force:true}).wait(delay)
@@ -183,7 +183,7 @@ describe('WebPay CC (Web 1)', () => {
         cy.xpath("//input[@type='submit']").click({force:true})
     })
 //*******************************************************************************
-    it.only('Residente - Pago WebPay', () => {
+    it('Residente - Pago WebPay', () => {
 
         const AUX_MAIL = 'Cypress_231222_155314@gmail.com' 
         const DELAY = 500;
@@ -295,7 +295,7 @@ describe('WebPay CC (Web 1)', () => {
         cy.get('.btn-link').click({force:true}).wait(DELAY)
     })
 //*******************************************************************************
-    it.only('Desactivar Comunidad', () => { 
+    it('Desactivar Comunidad', () => { 
 
         let aux = 'Cypress - 23/12/22 - 10:07'
 

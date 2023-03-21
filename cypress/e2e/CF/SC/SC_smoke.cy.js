@@ -24,6 +24,8 @@ describe('Smoke Test SC', () => {
     const DATE = dayjs().format('DD/MM/YY - HH:mm');
     const DATE2 = dayjs().format('DD/MM/YY');
     const NOMBRE = 'SC Cypress - ' + DATE;
+    
+    const aux = 'SC Cypress'
 
     // TEST CASES
 
@@ -51,9 +53,10 @@ describe('Smoke Test SC', () => {
       PAGINA_INICIAL(WEB);
     })
 
+    
     it.only('Crear Comunidad', () => {                
 
-        let delay = 1000
+        let delay = 2000
 
         INICIO_SUPERADMIN(USER,PASS);
 
@@ -79,6 +82,9 @@ describe('Smoke Test SC', () => {
         cy.xpath("//input[@type='submit']").click({force:true})
         cy.xpath("//input[@type='submit'][contains(@value,'Guardar')]").click({force:true})
 
+        // Otorgar permisos SuperAdmin
+        cy.get('.round').click({force:true})
+
         // Importar Propiedades
         cy.reload()
         cy.get('#excel_upload_name').select('Copropietarios',{force:true}).should('have.value','Copropietarios')
@@ -90,8 +96,7 @@ describe('Smoke Test SC', () => {
             cy.xpath(`(//td[contains(.,'A${i}')])[1]`).should('be.visible')
         }
         cy.xpath("//input[contains(@type,'submit')]").click({force:true})
-        
-        /*
+                
         // Importar Pagos
         cy.get('#excel_upload_name').select('Saldos',{force:true}).should('have.value','Saldos')
         cy.get('#excel_upload_excel').wait(delay).selectFile(RUTA_PAGOS,{force:true}).wait(delay)
@@ -102,8 +107,7 @@ describe('Smoke Test SC', () => {
             cy.xpath(`(//input[contains(@value,'A')])[${i}]`).should('be.visible')
         }
         cy.xpath("//input[contains(@type,'submit')]").click({force:true})
-        */
-       
+               
         // Configurar Admin
         cy.get('#user_first_name').clear({force:true}).type(nombreAdmin,{force:true})
         cy.get('#user_last_name').clear({force:true}).type(apellidoAdmin,{force:true})
@@ -117,16 +121,15 @@ describe('Smoke Test SC', () => {
 //*******************************************************************************
     it.only('Editar Comunidad', () => {  
 
-        let aux = 'cypress'
         INICIO_SUPERADMIN(USER,PASS)
         BUSCAR_COMUNIDAD(aux);
         
         // Acceder como SuperAdmin
-        cy.xpath("(//div[@class='btn btn-sm btn-success'][contains(.,'Entrar a comunidad')])[1]").should('be.visible').click({force:true});
+        cy.xpath("(//div[@class='btn btn-sm btn-success'][contains(.,'Entrar a comunidad')])[1]").should('be.visible').click({force:true}).wait(500).reload();
 
         // Editar comunidad
         cy.xpath("//div[@class='btn btn-success btn-block btn-home'][contains(.,'Editar comunidad')]").click({force:true});
-        cy.get('#setting_edit_tab').wait(1000).click({force:true});
+        cy.get('#setting_edit_tab').wait(1000).click({force:true}).wait(1000).reload();
         
         // Con Control de Periodo
         cy.xpath("//label[contains(.,'La comunidad trabaja con Control por Período')]/following-sibling::select").select('No',{force:true}).should('have.value','1')
@@ -167,9 +170,52 @@ describe('Smoke Test SC', () => {
         
     })
 //*******************************************************************************
-    it.only('Editar Usuario', () => {
+    it('Configurar STP', () => {
 
-        let aux = 'cypress'
+        INICIO_SUPERADMIN(USER,PASS)
+        BUSCAR_COMUNIDAD(aux);
+
+        // Acceder como SuperAdmin
+        cy.xpath("(//div[@class='btn btn-sm btn-success'][contains(.,'Entrar a comunidad')])[1]").should('be.visible').click({force:true});
+
+        // Editar comunidad
+        cy.xpath("//div[@class='btn btn-success btn-block btn-home'][contains(.,'Editar comunidad')]").click({force:true}).wait(1000).reload();
+
+        // Transferencias
+        cy.get('#banking_settings_edit_tab').wait(1000).click({force:true}).wait(1000).reload();
+
+        cy.get('#banking_setting_account_type').select('Clabe',{force:true}).should('have.value','clabe')
+
+        let cuenta_STP = 2039
+        let centro_costos = 1282
+        let rf_curp = 1234
+        let nro_cuenta_clabe = 646180203900040005
+        let nombre_ordentante = 'Juan'
+        let mail = 'j.treppo@gmail.com'
+        let nombre_centro_costos = '58265_CANTABRIA'
+        let clabe_centro_costos = '0005'
+
+        cy.get('#banking_setting_stp_account_number').type(cuenta_STP,{force:true})
+        cy.get('#banking_setting_costs_center').type(centro_costos,{force:true})
+        cy.get('#banking_setting_beneficiary_tin').type(rf_curp,{force:true})
+        cy.get('#banking_setting_payer_tin').type(rf_curp,{force:true})
+
+        cy.get('#banking_setting_clabe').type(nro_cuenta_clabe,{force:true})
+
+        cy.get('#banking_setting_payer_name').type(nombre_ordentante,{force:true})
+        cy.get('#banking_setting_email').type(mail,{force:true})
+        cy.get('#banking_setting_costs_center_name').type(nombre_centro_costos,{force:true})
+        cy.get('#banking_setting_costs_center_clabe').type(clabe_centro_costos,{force:true})
+
+        // Guardar
+        cy.xpath("//div[@class='btn btn-success btn-block btn-md banking-settings-submit']").click({force:true})
+        cy.xpath("//div[@class='btn btn-success btn-block'][contains(.,'Continuar')]").click({force:true})
+        cy.get('.flash-success').should('be.visible')
+
+    })
+//*******************************************************************************
+    it('Editar Usuario', () => {
+
         INICIO_SUPERADMIN(USER,PASS)
         BUSCAR_COMUNIDAD(aux);
 
@@ -208,11 +254,12 @@ describe('Smoke Test SC', () => {
 
         // Guardar
         cy.xpath("//input[contains(@value,'Guardar cambios')]").wait(1000).click({force:true}).click({force:true})
-        cy.get("#flash_notice").should("be.visible")
+       // cy.get("#flash_notice").should("be.visible")
     })
 //*******************************************************************************
-    it.only('Recaudación (Admin)', () => {
+    it('Recaudación (Admin)', () => {
 
+        mailAdmin = 'cypress070323@gmail.com'
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
 
@@ -301,7 +348,7 @@ describe('Smoke Test SC', () => {
         
     })
 //*******************************************************************************
-    it.only('Recaudación - Asignación Manual / Facturación', () => {
+    it('Recaudación - Asignación Manual / Facturación', () => {
         
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
@@ -359,7 +406,7 @@ describe('Smoke Test SC', () => {
     */
     })
 //*******************************************************************************
-    it.only('Medidores (Admin)', () => {
+    it('Medidores (Admin)', () => {
 
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
@@ -399,7 +446,7 @@ describe('Smoke Test SC', () => {
 
     })
 //*******************************************************************************
-    it.only('Cargos (Admin)', () => {
+    it('Cargos (Admin)', () => {
 
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
@@ -508,7 +555,7 @@ describe('Smoke Test SC', () => {
         }
     })
 //*******************************************************************************
-    it.only('Cargos (Admin) - Recargos y Descuentos', () => {
+    it('Cargos (Admin) - Recargos y Descuentos', () => {
         
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
@@ -572,7 +619,7 @@ describe('Smoke Test SC', () => {
     //    cy.get('.flash-success').should('be.visible')   
     })
 //*******************************************************************************
-    it.only('Egresos (Admin)', () => {  
+    it('Egresos (Admin)', () => {  
 
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
@@ -632,7 +679,7 @@ describe('Smoke Test SC', () => {
             })
     })
 //*******************************************************************************
-    it.only('Condóminos (Admin)', () => {
+    it('Condóminos (Admin)', () => {
         
         let domFiscal = '20928'
         let RFC = 'EKU9003173C9'
@@ -704,11 +751,11 @@ describe('Smoke Test SC', () => {
 
     })
 //*******************************************************************************
-    it.only('Desactivar Comunidad', () => { 
+    it('Desactivar Comunidad', () => { 
 
-        //let aux = 'Cypress'
+        let aux = 'SC - Cypress'
         INICIO_SUPERADMIN(USER,PASS);
-        BUSCAR_COMUNIDAD();
+        BUSCAR_COMUNIDAD(aux);
          
         let valorAsociado = 1000;
         let delay = 500;

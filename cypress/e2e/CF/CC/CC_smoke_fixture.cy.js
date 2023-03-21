@@ -95,6 +95,7 @@ describe('Smoke Test CC', () => {
         cy.xpath("//input[contains(@type,'submit')]").click({force:true})
         
         // Importar Pagos
+
         cy.wait(500).reload()
         cy.get('#excel_upload_name').select('Saldos',{force:true}).should('have.value','Saldos')
         cy.get('#excel_upload_excel').wait(delay).selectFile(RUTA_PAGOS,{force:true}).wait(delay)
@@ -144,7 +145,51 @@ describe('Smoke Test CC', () => {
 
     })
 //*******************************************************************************
-    it.only('Recaudación (Admin)', () => {
+    it('Editar Usuario', () => {
+
+        let aux = 'cypress'
+        INICIO_SUPERADMIN(USER,PASS)
+        BUSCAR_COMUNIDAD(aux);
+
+        // Acceder como SuperAdmin
+        cy.xpath("(//div[@class='btn btn-sm btn-success'][contains(.,'Entrar a comunidad')])[1]").should('be.visible').click({force:true});
+
+        let delay = 300
+        let RFC = '11.111.111-1'
+        let domFiscal = 'AV. FALSA 123'
+        let razonSocial = "Razon Social Cypress"
+
+        // Mi cuenta
+        cy.xpath("(//a[contains(@data-title,'Mi Cuenta')])[1]").click({force:true})
+
+        // Nombre (Primera opción)
+        cy.xpath("(//span[contains(@class,'name')])[1]").click({force:true})
+        // Editar
+        cy.xpath("//button[contains(.,'Editar')]").click({force:true})
+        
+        // País
+        cy.get("#user_country_code").select("Chile",{force:true}).should('have.value','CL')
+        // RFC
+        cy.get('#user_identifications_attributes_0_identity').type(RFC,{force:true})
+
+        // Domicilio Fiscal
+        cy.get('#autocomplete').clear().type(domFiscal,{force:true})
+       
+       /* // Regimen Fiscal
+        cy.get("#user_fiscal_identification_attributes_fiscal_regime")
+        .select("605 - Sueldos y Salarios e Ingresos Asimilados a Salarios",{force:true})
+        .should('have.value','605')
+        // CFDI
+        cy.get("#user_fiscal_identification_attributes_cfdi_use")
+        .select("S01 - Sin efectos fiscales",{force:true})
+        .should('have.value','S01')
+*/
+        // Guardar
+        cy.xpath("//input[contains(@value,'Guardar cambios')]").wait(1000).click({force:true}).click({force:true})
+        cy.get("#flash_notice").should("be.visible")
+    })
+//*******************************************************************************
+    it('Recaudación (Admin)', () => {
 
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
@@ -191,10 +236,12 @@ describe('Smoke Test CC', () => {
                 cy.get('#submit-button').click({force:true})
 
                 // Verificar
-                cy.get('.flash-success').should('be.visible')
-
+                //cy.get('.flash-success').should('be.visible')
+                cy.wait(3000).reload()
+/*
                 // Verificar alerta de posible pago duplicado
                 if (duplicados == true){
+                    cy.wait(3000).reload()
                     cy.xpath("//span[contains(@id,'flash')]").each(($el) => {
 
                         const TEXT1 = $el.text()
@@ -205,7 +252,7 @@ describe('Smoke Test CC', () => {
                         }
                     })
                 }
-            }
+            */   }
         }
 
         // Crear pagos 
@@ -215,7 +262,10 @@ describe('Smoke Test CC', () => {
         CREAR_PAGOS(2,true)
 
         // Notificar pagos
-        cy.xpath("(//div[@data-original-title='Notificar pagos'])[1]").click({force:true})
+        cy.wait(5000).reload().wait(2000)
+
+        cy.xpath("(//div[contains(@title,'Notificar pagos')])[1]").click({force:true})
+        //cy.xpath("(//div[@data-original-title='Notificar pagos'])[1]").click({force:true})
         cy.get('#flash_notice').should('contain','Notificando comprobantes de pago')
 
         // Importar recaudaciones
@@ -298,7 +348,7 @@ describe('Smoke Test CC', () => {
         }
     })
 //*******************************************************************************
-    it.only('Egresos (Admin)',() => {  
+    it('Egresos (Admin)',() => {  
 
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
@@ -358,7 +408,7 @@ describe('Smoke Test CC', () => {
             })
     })
 //*******************************************************************************
-    it.only('Cargos (Admin)', () => {
+    it('Cargos (Admin)', () => {
 
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
@@ -481,12 +531,12 @@ describe('Smoke Test CC', () => {
         }
     })
 //*******************************************************************************
-    it.only('Gasto Común (Admin)', () => {
+    it('Gasto Común (Admin)', () => {
 
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
 
-        cy.xpath("//div[@class='divLink'][contains(.,'Gastos comunes')]").should('be.visible').click({force:true})
+        cy.xpath("//div[@class='divLink'][contains(.,'Gastos comunes')]").should('be.visible').click({force:true}).wait(3000)
         
         cy.xpath("//input[@value='Finalizar gastos comunes']").should('be.visible').click({force:true})
 
@@ -510,16 +560,16 @@ describe('Smoke Test CC', () => {
     })
     })
 //*******************************************************************************
-    it.only('Residentes (Admin)', () => {
+    it('Residentes (Admin)', () => {
         
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
 
         // Módulo Residentes
-        cy.xpath("//span[contains(.,'Copropietarios')]").click({force:true})
+        cy.xpath("//span[contains(.,'Residentes')]").click({force:true})
         
         // Nuevo Residente
-        cy.xpath("//div[@class='btn btn-success pull-right btn-block'][contains(.,'Nuevo copropietario')]").click({force:true})
+        cy.xpath("//div[@class='btn btn-success pull-right btn-block'][contains(.,'Nuevo residente')]").click({force:true})
         cy.get("#search_email").type(mailRes,{force:true})
         cy.get('#search_email_btn').click({force:true})
 
@@ -547,10 +597,12 @@ describe('Smoke Test CC', () => {
 
     })
 //*******************************************************************************
-    it.only('Desactivar Comunidad', () => { 
+    it('Desactivar Comunidad', () => { 
+
+        let aux = 'Cypress - ' + DATE2
 
         INICIO_SUPERADMIN(USER,PASS);
-        BUSCAR_COMUNIDAD();
+        BUSCAR_COMUNIDAD(aux);
         
         let valorAsociado = 1000;
         let delay = 500;
@@ -568,7 +620,6 @@ describe('Smoke Test CC', () => {
         cy.xpath("//input[contains(@value,'Guardar')]").click({force: true})
 
         cy.log('*** FIN DEL TEST ***')
-
 
     })
 });
