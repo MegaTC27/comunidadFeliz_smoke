@@ -168,6 +168,10 @@ export const CIERRE_MODALES = () => {
   
 }
 
+export const ADMIN_CERRAR_SESION = () => {
+  cy.xpath("(//a[contains(@data-title,'Mi Cuenta')])[1]").click({force:true})
+  cy.xpath("(//a[@href='/log_out'][contains(.,'Cerrar sesión')])[1]").click({force:true});
+}
 
 // Módulo Medidores
 export const MEDIDORES = () => {
@@ -194,6 +198,19 @@ export const RES_MODAL_LATAM = () => {
   })
 }
 
+export const RES_BIENVENIDA = () => {
+  cy.get('h1').each(($el) => {
+
+      const TEXT1 = $el.text()
+      const RESULTADO = TEXT1.includes('¡Te damos la bienvenida')
+      
+      if (RESULTADO){
+        cy.xpath("//button[contains(.,'Entendido')]").should('be.visible').click({force:true})
+        cy.log(' ####### MODAL DE BIENVENIDA CERRADO ####### ')
+      }
+  })
+}
+
 export const RES_MODAL_NUEVA_VISTA = () => {
   cy.xpath('//button').each(($el) => {
 
@@ -208,6 +225,7 @@ export const RES_MODAL_NUEVA_VISTA = () => {
 }
 
 export const RES_CIERRE_MODALES = () => {
+  RES_BIENVENIDA()
   RES_MODAL_LATAM()
   RES_MODAL_NUEVA_VISTA()
 }
@@ -223,4 +241,9 @@ export const RES_TERMINOS_CONDICIONES = () => {
         cy.log(' ####### TÉRMIOS Y CONDICIONES CERRADO ####### ')
       } 
   })
+}
+
+export const RES_CERRAR_SESION = () =>{
+  cy.xpath('(//button[contains(@class,"css-o8riuk")])[2]').click({force:true});
+  cy.xpath("//div[@role='menuitem'][contains(.,'Cerrar sesión')]").click({force:true});
 }

@@ -2,7 +2,7 @@ require('cypress-xpath')        // Selector de Xpath
 require('cypress-plugin-tab')   // Tabulacion por comando
 
 const dayjs = require('dayjs')  // Importar fecha
-const { DIMENSIONES, PAGINA_INICIAL, INICIO_SUPERADMIN, INICIO_ADMIN, BUSCAR_COMUNIDAD, CIERRE_MODALES } = require('../cf_functions');
+const { DIMENSIONES, PAGINA_INICIAL, INICIO_SUPERADMIN, INICIO_ADMIN, BUSCAR_COMUNIDAD, CIERRE_MODALES,  } = require('../cf_functions');
 
 describe('Smoke Test CC', () => {
 
@@ -48,7 +48,7 @@ describe('Smoke Test CC', () => {
         PAGINA_INICIAL(WEB);
     })
 
-    it.only('Crear Comunidad', () => {                
+    it('Crear Comunidad', () => {                
 
         let delay = 1000
 
@@ -118,13 +118,13 @@ describe('Smoke Test CC', () => {
         cy.xpath("//span[contains(@id,'notice')][contains(.,'Administrador ingresado')]").should('be.visible')
     })
 //*******************************************************************************
-    it.only('Editar Comunidad',() => {  
+    it('Editar Comunidad',() => {  
 
         INICIO_SUPERADMIN(USER,PASS)
         BUSCAR_COMUNIDAD();
         
         // Acceder como SuperAdmin
-        cy.xpath("(//div[@class='btn btn-sm btn-success'][contains(.,'Entrar a comunidad')])[1]").click({force:true});
+        cy.xpath("(//div[@class='btn btn-xs btn-green-cf'][contains(.,'Superadmin')])[1]").click({force:true});
 
         // Editar comunidad
         cy.xpath("//div[@class='btn btn-success btn-block btn-home'][contains(.,'Editar comunidad')]").click({force:true});
@@ -152,7 +152,7 @@ describe('Smoke Test CC', () => {
         BUSCAR_COMUNIDAD(aux);
 
         // Acceder como SuperAdmin
-        cy.xpath("(//div[@class='btn btn-sm btn-success'][contains(.,'Entrar a comunidad')])[1]").should('be.visible').click({force:true});
+        cy.xpath("(//div[@class='btn btn-xs btn-green-cf'][contains(.,'Superadmin')])[1]").should('be.visible').click({force:true});
 
         let delay = 300
         let RFC = '11.111.111-1'
@@ -364,7 +364,7 @@ describe('Smoke Test CC', () => {
         // Crear 3 Egresos distintos
 
         for (let i = 0; i <= 2; i++) {
-            cy.xpath("//div[@class='btn btn-success pull-right btn-block '][contains(.,'Nuevo Egreso')]").click({force:true})
+            cy.xpath("//div[contains(@data-intro,'Agregar nuevo egreso.')]").click({force:true})
             cy.get("#service_billing_name").type(`${descripcion} - ${i+1}`,{force:true})
             cy.get('#service_billing_price').type(monto, {force:true})
 
@@ -403,7 +403,7 @@ describe('Smoke Test CC', () => {
                 for (let i = 0; i < cantidad; i++) {
                     cy.xpath("(//div[@data-original-title='Opciones'])[1]").click({force:true})
                     cy.xpath("(//div[@class='dropdown-item'][contains(.,'Anular egreso')])[1]").should('be.visible').click({force:true})
-                    cy.xpath("//a[contains(.,'Egresos gasto común')]").click({force:true})
+                    cy.xpath("(//a[contains(.,'Gasto común')])[1]").click({force:true})
                 }
             })
     })
@@ -424,7 +424,7 @@ describe('Smoke Test CC', () => {
         for (let i = 1; i <= 3; i++) {
     
             // Nuevo Cargo
-            cy.xpath("//div[contains(@data-intro,'nuevo cargo')]").should("be.visible").click({force: true});
+            cy.xpath("//div[@class='btn btn-green-cf btn- pull-right btn-block'][contains(.,'Nuevo cargo')]").should("be.visible").click({force: true});
 
             // Seleccionar unidad
             cy.get('.multiselect').should("be.visible").click({force:true})
@@ -453,10 +453,10 @@ describe('Smoke Test CC', () => {
             if (i==1) {
                 cy.xpath("(//td[@class='hidden-xs text-right'])[1]").should('contain', monto)
             } else if(i==2) {
-                cy.xpath("//a[contains(.,'Cobrados por otro medio')]").should("be.visible").click({force:true})
+                cy.xpath("(//a[contains(.,'Cobrados por otro medio')])[1]").should("be.visible").click({force:true})
                 cy.xpath("(//td[@class='hidden-xs text-right'])[1]").should('contain', monto)
             } else {
-                cy.xpath("//a[contains(.,'Cobrar ahora y generar deuda')]").should("be.visible").click({force:true})
+                cy.xpath("(//a[contains(.,'Cobrar ahora y generar deuda')])[1]").should("be.visible").click({force:true})
                 cy.xpath("(//td[@class='hidden-xs text-right'])[1]").should('contain', monto)
             }
         }
@@ -465,7 +465,7 @@ describe('Smoke Test CC', () => {
         
         let suma = 0;
 
-        cy.xpath("//a[contains(.,'Cobrados por otro medio')]").should("be.visible").click({force:true})
+        cy.xpath("(//a[contains(.,'Cobrados por otro medio')])[1]").should("be.visible").click({force:true})
         
         // Sumar todos los montos de 'Cobrados por otro medio' 
         cy.xpath("(//td[@class='hidden-xs text-right'])").each(($el)=>{
@@ -517,15 +517,15 @@ describe('Smoke Test CC', () => {
         
         for (let i = 0; i <= 2; i++) {
             if (i==0) {
-                cy.xpath("//a[contains(.,'Cobrados en boleta')]").should("be.visible").click({force:true})
+                cy.xpath("(//a[contains(.,'Cobrados en boleta')])[1]").should("be.visible").click({force:true})
                 ANULAR_COBROS()
 
             } else if(i==1) {
-                cy.xpath("//a[contains(.,'Cobrados por otro medio')]").should("be.visible").click({force:true})
+                cy.xpath("(//a[contains(.,'Cobrados por otro medio')])[1]").should("be.visible").click({force:true})
                 ANULAR_COBROS()
 
             } else {
-                cy.xpath("//a[contains(.,'Cobrar ahora y generar deuda')]").should("be.visible").click({force:true})
+                cy.xpath("(//a[contains(.,'Cobrar ahora y generar deuda')])[1]").should("be.visible").click({force:true})
                 ANULAR_COBROS()
             }
         }
@@ -538,13 +538,13 @@ describe('Smoke Test CC', () => {
 
         cy.xpath("//div[@class='divLink'][contains(.,'Gastos comunes')]").should('be.visible').click({force:true}).wait(3000)
         
-        cy.xpath("//input[@value='Finalizar gastos comunes']").should('be.visible').click({force:true})
+        cy.xpath("//a[contains(@id,'#warnings-button')]").should('be.visible').click({force:true})
 
-        cy.get("#submit_button").wait(1000).click({force:true})
-        cy.get('#confirm_button').click({force:true})
-        
-        cy.get('#confirm_password_password').type(PASS,{force:true})
-        cy.get('#password_confirmation_submit_button').should('be.visible').click({force:true})
+        cy.xpath("//input[@id='confirm-continue']").click({force:true})
+
+        cy.xpath("//input[@id='continue-button']").wait(1000).click({force:true}).wait(1000)
+
+        cy.xpath("//input[contains(@id,'submit_button')]").wait(1000).click({force:true})
 
         //cy.wait(45000)
         cy.xpath("//div[@class='divLink'][contains(.,'Gastos comunes')]").should('be.visible').click({force:true})
@@ -552,10 +552,10 @@ describe('Smoke Test CC', () => {
         cy.get('.flash-warning').each(($el) => {
 
         const TEXT1 = $el.text()
-        const RESULTADO = TEXT1.includes('Recalculando los gastos comunes')
+        const RESULTADO = TEXT1.includes('Procesos trabajando internamenten')
         
         if (RESULTADO){
-            cy.xpath("//span[contains(@id,'flash')]").should('contain','Recalculando los gastos comunes').as('recalculando_gastos')
+            cy.xpath("//span[contains(@id,'flash')]").should('contain','Procesos trabajando internamente').as('recalculando_gastos')
         }
     })
     })
@@ -569,9 +569,9 @@ describe('Smoke Test CC', () => {
         cy.xpath("//span[contains(.,'Residentes')]").click({force:true})
         
         // Nuevo Residente
-        cy.xpath("//div[@class='btn btn-success pull-right btn-block'][contains(.,'Nuevo residente')]").click({force:true})
+        cy.xpath("//div[@class='btn btn-green-cf btn-block height-search-btn'][contains(.,'Nuevo residente')]").click({force:true})
         cy.get("#search_email").type(mailRes,{force:true})
-        cy.get('#search_email_btn').click({force:true})
+        cy.get('#search_email_btn').click({force:true}).wait(2000)
 
         cy.get("#user_first_name").type(nombreRes,{force:true})
         cy.get("#user_last_name").type(apellidoRes,{force:true})
@@ -597,7 +597,7 @@ describe('Smoke Test CC', () => {
 
     })
 //*******************************************************************************
-    it('Desactivar Comunidad', () => { 
+    it.only('Desactivar Comunidad', () => { 
 
         let aux = 'Cypress - ' + DATE2
 
@@ -605,7 +605,7 @@ describe('Smoke Test CC', () => {
         BUSCAR_COMUNIDAD(aux);
         
         let valorAsociado = 1000;
-        let delay = 500;
+        let delay = 700;
 
         cy.xpath("(//div[@type='button'])[contains(.,'Desactivar')][1]").wait(delay).click().wait(delay)
         cy.get('.btn-group > .multiselect').click({force: true})
