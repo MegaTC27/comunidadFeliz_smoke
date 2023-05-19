@@ -80,6 +80,10 @@ describe('Smoke Test SC', () => {
         cy.get('#autocomplete').type(direccion,{force:true}).tab()
         cy.get("#community_timezone").select("America/Mexico_City",{force:true}).should('have.value','America/Mexico_City')
         cy.xpath("//input[@type='submit']").click({force:true})
+        // Mail de contacto
+        cy.get("#account_account_contacts_attributes_0__destroy").wait(500).click({force:true})
+        cy.get("#account_account_contacts_attributes_0_email").wait(500).clear().type(SUP_ADMIN_MAIL,{force:true})
+
         cy.xpath("//input[@type='submit'][contains(@value,'Guardar')]").click({force:true})
 
         // Otorgar permisos SuperAdmin

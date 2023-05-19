@@ -5,8 +5,9 @@ const USER = Cypress.env('USER_5');
 const PASS = Cypress.env('PASS_5');
 
 const DATE = dayjs().format('DD/MM/YY - HH:mm');
+const DATE2 = dayjs().format('DD/MM/YY');
 const DATE_AUX = dayjs().format('DDMMYY');
-const NOMBRE = 'Cypress - ' + DATE;
+const NOMBRE = 'Cypress - ' + DATE2;
 
 let nombreAdmin = 'Cypress'
 let mailAdmin = nombreAdmin + DATE_AUX + '@gmail.com'

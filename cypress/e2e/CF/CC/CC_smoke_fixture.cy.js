@@ -74,6 +74,11 @@ describe('Smoke Test CC', () => {
         cy.get('#community_country_code').select('Chile',{force:true}).should('have.value','CL')
         cy.get('#autocomplete').type(direccion,{force:true}).tab()
         cy.xpath("//input[@type='submit']").click({force:true})
+        
+        // Mail de contacto
+        cy.get("#account_account_contacts_attributes_0__destroy").wait(500).click({force:true})
+        cy.get("#account_account_contacts_attributes_0_email").wait(500).clear().type(SUP_ADMIN_MAIL,{force:true})
+        
         cy.xpath("//input[@type='submit'][contains(@value,'Guardar')]").click({force:true})
 
         // Otorgar permisos 
@@ -265,7 +270,6 @@ describe('Smoke Test CC', () => {
         cy.wait(5000).reload().wait(2000)
 
         cy.xpath("(//div[contains(@title,'Notificar pagos')])[1]").click({force:true})
-        //cy.xpath("(//div[@data-original-title='Notificar pagos'])[1]").click({force:true})
         cy.get('#flash_notice').should('contain','Notificando comprobantes de pago')
 
         // Importar recaudaciones
@@ -531,28 +535,69 @@ describe('Smoke Test CC', () => {
         }
     })
 //*******************************************************************************
+    it('Ingresos Extraordinarios (Admin)', () => {
+
+        INICIO_ADMIN(mailAdmin, PASS);
+        CIERRE_MODALES();
+        
+        // Módulo Ingresos Extraordinarios
+        const MODULO_INGRESOS = () => {
+            cy.xpath("//span[contains(.,'Ingresos extraordinarios')]").click({force: true});
+        }
+
+        MODULO_INGRESOS();
+
+        // Crear 3 ingresos con distintas formas de cobro
+        for (let i = 1; i <= 3; i++) {
+
+            // Nuevo Ingreso
+            cy.xpath("//div[contains(@data-intro,'Agregar nuevo ingreso.')]").should("be.visible").click({force: true});
+
+            // Nombre y monto
+            let monto = i + '00'
+            cy.get("#income_name").should("be.visible").type(`Ingreso Cypress 0${i}`, {force: true});
+            cy.get("#income_price").should("be.visible").type(monto, {force: true});
+
+            // Medio de pago
+            if (i == 1){
+                cy.get('#income_payment_type').select('Efectivo',{force:true}).should('have.value',1);
+            } else if (i == 2){
+                cy.get('#income_payment_type').select('Transferencia',{force:true}).should('have.value',2);
+            } else {
+                cy.get('#income_payment_type').select('Depósito',{force:true}).should('have.value',3);
+            }
+
+            // Comentario
+            cy.get("#income_note").type(`Ingreso Cypress ${i}`,{force:true})
+
+            // Crear
+            cy.xpath("//input[@type='submit']").click({force:true})
+        }
+    })
+//*******************************************************************************
     it('Gasto Común (Admin)', () => {
 
         INICIO_ADMIN(mailAdmin, PASS);
         CIERRE_MODALES();
 
-        cy.xpath("//div[@class='divLink'][contains(.,'Gastos comunes')]").should('be.visible').click({force:true}).wait(3000)
+        cy.xpath("//div[@class='divLink'][contains(.,'Gastos comunes')]").should('be.visible').click({force:true}).wait(1500)
         
         cy.xpath("//a[contains(@id,'#warnings-button')]").should('be.visible').click({force:true})
 
-        cy.xpath("//input[@id='confirm-continue']").click({force:true})
+        cy.xpath("//div[@class='btn btn-light-blue btn-xs pull-right'][contains(.,'Actualizar')]").click({force:true})
+        cy.xpath("//input[@id='confirm-continue']").wait(1500).check({force:true}).wait(1500)
+        cy.xpath("//input[@id='continue-button']").click({force:true}).wait(1500)
 
-        cy.xpath("//input[@id='continue-button']").wait(1000).click({force:true}).wait(1000)
-
-        cy.xpath("//input[contains(@id,'submit_button')]").wait(1000).click({force:true})
-
-        //cy.wait(45000)
-        cy.xpath("//div[@class='divLink'][contains(.,'Gastos comunes')]").should('be.visible').click({force:true})
+        // Confirmar cierre
+        cy.get("#submit_button").wait(1000).click({force:true})
+        cy.get('#confirm_button').click({force:true})
+        cy.get('#confirm_password_password').type(pass,{force:true})
+        cy.get('#password_confirmation_submit_button').click({force:true})
 
         cy.get('.flash-warning').each(($el) => {
 
         const TEXT1 = $el.text()
-        const RESULTADO = TEXT1.includes('Procesos trabajando internamenten')
+        const RESULTADO = TEXT1.includes('Procesos trabajando internamente')
         
         if (RESULTADO){
             cy.xpath("//span[contains(@id,'flash')]").should('contain','Procesos trabajando internamente').as('recalculando_gastos')
@@ -620,6 +665,5 @@ describe('Smoke Test CC', () => {
         cy.xpath("//input[contains(@value,'Guardar')]").click({force: true})
 
         cy.log('*** FIN DEL TEST ***')
-
     })
 });
