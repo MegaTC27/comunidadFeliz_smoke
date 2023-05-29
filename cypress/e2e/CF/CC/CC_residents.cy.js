@@ -3,13 +3,10 @@ require('cypress-plugin-tab')   // Tabulacion por comando
 require('cypress-iframe')
 
 const dayjs = require('dayjs')  // Importar fecha
-const { DIMENSIONES, PAGINA_INICIAL, INICIO_SUPERADMIN, INICIO_ADMIN, BUSCAR_COMUNIDAD, MODAL_CAMBIAR_PASS,
-    CIERRE_MODALES, RES_CIERRE_MODALES, RES_TERMINOS_CONDICIONES, RES_BIENVENIDA, RES_CERRAR_SESION, ADMIN_CERRAR_SESION, MODAL_BIENVENIDA, CIERRE_MODALES_ADMIN,CIERRE_MODALES_2 } = require('../cf_functions');
+const { DIMENSIONES, PAGINA_INICIAL, INICIO_SUPERADMIN, INICIO_ADMIN, BUSCAR_COMUNIDAD,
+    CIERRE_MODALES, RES_CIERRE_MODALES, RES_TERMINOS_CONDICIONES } = require('../cf_functions');
 
 describe('Smoke Test Residents', () => {
-
-    // SUPERADMIN
-    const SUP_ADMIN_MAIL = 'juan.treppo@comunidadfeliz.cl'
 
     // ADMIN
     let nombreAdmin = 'Cypress'
@@ -43,7 +40,7 @@ describe('Smoke Test Residents', () => {
 
     // FUNCIONES
 
-    const INICIO_COMUNIDAD_SUPERADMIN = () =>{
+    const INICIO_COMUNIDAD_SUPERADMIN = () => {
         INICIO_SUPERADMIN(USER,PASS)
         BUSCAR_COMUNIDAD();
         // Acceder como SuperAdmin
@@ -103,7 +100,7 @@ describe('Smoke Test Residents', () => {
 
         // Mail de contacto
         cy.xpath("//input[contains(@id,'account_account_contacts_attributes_0__destroy')]").wait(500).click({force:true}).wait(500)
-        cy.get("#account_account_contacts_attributes_0_email").wait(500).type(SUP_ADMIN_MAIL,{force:true}).wait(1000)
+        cy.get("#account_account_contacts_attributes_0_email").wait(500).type(USER,{force:true}).wait(1000)
 
         cy.xpath("//input[@type='submit'][contains(@value,'Guardar')]").click({force:true})
 
@@ -171,14 +168,10 @@ describe('Smoke Test Residents', () => {
 //*******************************************************************************    
     it('Editar Comunidad',() => {  
 
-        INICIO_SUPERADMIN(USER,PASS)
-        BUSCAR_COMUNIDAD();
+        // SUPER ADMIN
+        INICIO_COMUNIDAD_SUPERADMIN()
         
-        // Acceder como SuperAdmin
-        cy.xpath("(//div[@class='btn btn-xs btn-green-cf'][contains(.,'Superadmin')])[1]").click({force:true});
-
         CIERRE_MODALES();
-      // MODAL_BIENVENIDA()
 
         // Editar comunidad
         cy.xpath("//a[@class='no-underline'][contains(.,'Editar comunidad')]").click({force:true});
@@ -206,12 +199,12 @@ describe('Smoke Test Residents', () => {
     })
 //*******************************************************************************
     it('Crear Publicación', () => {
+                
+        // SUPER ADMIN
+        INICIO_COMUNIDAD_SUPERADMIN()
 
         // ADMIN
         // INICIO_ADMIN(mailAdmin, pass)
-        
-        // SUPER ADMIN
-        INICIO_COMUNIDAD_SUPERADMIN()
 
         CIERRE_MODALES();
 
@@ -252,12 +245,12 @@ describe('Smoke Test Residents', () => {
 //*******************************************************************************
     it('Eliminar Publicaciones', () => {
 
-        // INICIO_ADMIN(mailAdmin, pass);
-
         // SUPER ADMIN
         INICIO_COMUNIDAD_SUPERADMIN()
 
-        // CIERRE_MODALES(); // En caso de fallos al probar este Test individualmente, dejarlo comentado
+        // INICIO_ADMIN(mailAdmin, pass);
+        
+        CIERRE_MODALES();
 
         cy.xpath("//div[@class='btn btn-default btn-xs'][contains(.,'Ver todas las publicaciones')]").click({force:true}).wait(1000)
 
@@ -280,7 +273,7 @@ describe('Smoke Test Residents', () => {
         INICIO_COMUNIDAD_SUPERADMIN()
 
         // Editar comunidad
-        cy.xpath("//div[@class='btn btn-success btn-block btn-home'][contains(.,'Editar comunidad')]").click({force:true});
+        cy.xpath("//a[@class='no-underline'][contains(.,'Editar comunidad')]").click({force:true});
         
         //----------------
         
@@ -314,16 +307,16 @@ describe('Smoke Test Residents', () => {
     })
 //*******************************************************************************
     it('Crear Fondos', () => {
-        
-        // INICIO_ADMIN(mailAdmin, pass);
 
         // SUPER ADMIN
         INICIO_COMUNIDAD_SUPERADMIN()
 
+        // INICIO_ADMIN(mailAdmin, pass);
+
         CIERRE_MODALES();
 
         // Fondos
-        cy.xpath("//div[@class='btn btn-success btn-block btn-home'][contains(.,'Editar comunidad')]").click({force:true});
+        cy.xpath("//a[@class='no-underline'][contains(.,'Editar comunidad')]").click({force:true});
 
         for (let i = 1; i < 6; i++) {
             cy.get("#funds_edit_tab").click({force:true});
@@ -338,11 +331,11 @@ describe('Smoke Test Residents', () => {
     })
 //*******************************************************************************
     it('Eliminar Fondos', () => {
-        
-        // INICIO_ADMIN(mailAdmin, pass);
 
         // SUPER ADMIN
         INICIO_COMUNIDAD_SUPERADMIN()
+        
+        // INICIO_ADMIN(mailAdmin, pass);
 
         CIERRE_MODALES(); // En caso de fallos al probar este Test individualmente como Admin, dejarlo comentado
 
@@ -365,12 +358,12 @@ describe('Smoke Test Residents', () => {
 //*******************************************************************************
     it('Egresos contra Fondos', () => {
 
-       INICIO_ADMIN(mailAdmin, pass);
-       
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
 
-        CIERRE_MODALES(); // En caso de fallos al probar este Test individualmente como Admin, dejarlo comentado
+        INICIO_ADMIN(mailAdmin, pass);
+
+        CIERRE_MODALES();
 
         const SELECT_FONDO = "Fondo 001" // Actualizar Value
         const DESCRIPCION = 'BBB FONDO'
@@ -390,10 +383,10 @@ describe('Smoke Test Residents', () => {
 //*******************************************************************************
     it('Ingresos contra Fondos', () => {
 
-       INICIO_ADMIN(mailAdmin, pass);
-
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
+        
+        INICIO_ADMIN(mailAdmin, pass);
 
         CIERRE_MODALES(); // En caso de fallos al probar este Test individualmente como Admin, dejarlo comentado
 
@@ -416,12 +409,12 @@ describe('Smoke Test Residents', () => {
         }
     })
 //*******************************************************************************
-    it('Crear Residente - Admin', () => {
-        
-        INICIO_ADMIN(mailAdmin, pass);
+    it.only('Crear Residente - Admin', () => {
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
+
+        INICIO_ADMIN(mailAdmin, pass);
 
         CIERRE_MODALES();
         const RES_PASS = 'feliz21.'
@@ -458,13 +451,12 @@ describe('Smoke Test Residents', () => {
 
     })
 //*******************************************************************************
-    it.only('Recaudación / Egresos / Cargos / Ingresos',() => {  
-
-        //PAGINA_INICIAL(WEB);
-        INICIO_ADMIN(mailAdmin,pass)
+    it('Recaudación / Egresos / Cargos / Ingresos',() => {  
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
+
+        INICIO_ADMIN(mailAdmin,pass)
 
         CIERRE_MODALES()
 
@@ -622,6 +614,9 @@ describe('Smoke Test Residents', () => {
     })
 //*******************************************************************************
     it('Gasto Común (Admin)', () => {
+        
+        // SUPER ADMIN
+        //INICIO_COMUNIDAD_SUPERADMIN()
 
         INICIO_ADMIN(mailAdmin, pass);
         CIERRE_MODALES();
@@ -696,7 +691,9 @@ describe('Smoke Test Residents', () => {
 //*******************************************************************************
     it('Eliminar registros de solicitud (ADMIN)',() => {  
 
-        PAGINA_INICIAL(WEB);
+        // SUPER ADMIN
+        //INICIO_COMUNIDAD_SUPERADMIN()
+
         INICIO_ADMIN(mailAdmin,pass)
         CIERRE_MODALES()
 
@@ -717,7 +714,9 @@ describe('Smoke Test Residents', () => {
 //*******************************************************************************
     it('Aceptar registros de solicitud (ADMIN)',() => {  
 
-        PAGINA_INICIAL(WEB);
+        // SUPER ADMIN
+        //INICIO_COMUNIDAD_SUPERADMIN()
+        
         INICIO_ADMIN(mailAdmin,pass)
         CIERRE_MODALES()
 
@@ -761,7 +760,9 @@ describe('Smoke Test Residents', () => {
 //*******************************************************************************
     it('Aceptación de validación (ADMIN)',() => {  
 
-        PAGINA_INICIAL(WEB);
+        // SUPER ADMIN
+        //INICIO_COMUNIDAD_SUPERADMIN()
+        
         INICIO_ADMIN(mailAdmin,pass)
         CIERRE_MODALES()
 
@@ -782,7 +783,7 @@ describe('Smoke Test Residents', () => {
         });     
     })
 //*******************************************************************************
-    it('Cartola',() => {  
+    it.only('Cartola',() => {  
 
         INICIO_ADMIN(mailRes,pass)
         cy.wait(4000)
@@ -959,16 +960,4 @@ describe('Smoke Test Residents', () => {
 
         cy.get('.flash-success').should("be.visible")
     })
-    //*******************************************************************************
-  /*  it.only('Prueba - Admin', () => {
-        
-        INICIO_ADMIN(mailAdmin, pass);
-        CIERRE_MODALES(); // En caso de fallos al probar este Test individualmente como Admin, dejarlo comentado
-        const RES_PASS = 'feliz21.'
-
-        // Módulo Residentes
-        cy.xpath("//span[contains(.,'Residentes')]").click({force:true})
-
-    })
-    */
 })

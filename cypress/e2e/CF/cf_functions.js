@@ -73,14 +73,15 @@ export const MODAL_TYC = () => {
 export const MODAL_CAMBIAR_PASS = () => {
   // Verifcar modal de Cambia tu contraseña
 
-  cy.get('div').each(($el,index, $list) => {
+  cy.get('a').each(($el,index, $list) => {
 
     const TEXT1 = $el.text()
     const RESULTADO = TEXT1.includes('No por ahora')
-  
+
     if (RESULTADO){
       cy.xpath("//a[contains(@href,'now=true')]").should('be.visible').click({force:true})
       cy.log('####### MODAL DE CAMBIAR CONTRASEÑA CERRADO #######')
+            
     }
   })  
 }
@@ -113,21 +114,24 @@ export const MODAL_CAMBIAR_PASS = () => {
 export const SELECCIONAR_COMUNIDAD = (aux = NOMBRE) => {
   // Seleccionar ultima comunidad al iniciar como Admin
 
+  let cantidad = 0
+
   cy.get('div').each(($el) => {
     
     const TEXT1 = $el.text()
     const RESULTADO = TEXT1.includes('Comunidades que')
-    let cantidad = 0
 
     if (RESULTADO){
-      cy.xpath("(//div[contains(@class,'col-xs-12 no-padding')])").each(($list) => {
-        cantidad = $list.length + 1
-      
-      }).then(()=> {
-        cy.xpath(`(//div[contains(@class,"col-xs-12 no-padding")])[${cantidad}]`).click({force: true})
+      cy.xpath("(//div[contains(@class,'col-xs-12 no-padding')])").each(($el,index, $list) => {
+        cantidad = $list.length
       })
     } 
-  })   
+    
+  }).then(()=> {
+    if (cantidad > 0){
+      cy.xpath(`(//div[contains(@class,"col-xs-12 no-padding")])[${cantidad}]`).click({force: true})
+    }
+  })
 }
 
 /* export const MODAL_BIENVENIDA_OLD = () => {
