@@ -194,6 +194,88 @@ describe('Smoke Test CC', () => {
         cy.get("#flash_notice").should("be.visible")
     })
 //*******************************************************************************
+    it.only('Crear Publicación', () => {
+        const ID_COMUNIDAD = '65958'
+
+        INICIO_ADMIN(mailAdmin, pass);
+
+        /*
+        // SUPER ADMIN
+        INICIO_SUPERADMIN(USER,PASS)
+        BUSCAR_COMUNIDAD(ID_COMUNIDAD);
+        // Acceder como SuperAdmin
+        cy.xpath("(//div[@class='btn btn-xs btn-green-cf'][contains(.,'Superadmin')])[1]").click({force:true});
+        */
+
+        cy.wait(2000)
+        CIERRE_MODALES();
+
+        const TITULO = 'Cypress - ' + DATE
+        const CONTENIDO = 'Contenido de la publicación - ' + DATE
+
+        for (let i = 1; i <= 3; i++){
+            // Panel
+            cy.get("#sidebar-panel").click({force:true})
+
+            // Crear Publicacion
+            cy.xpath("//div[@class='btn btn-success btn-xs'][contains(.,'Crear publicación')]").click({force:true});
+            cy.get("#post_title").type(TITULO,{force:true})
+
+            // iFrame
+
+            const IFRAME = cy.xpath("//*[@id='cke_1_contents']/iframe")
+            .its('0.contentDocument.body')
+            .should('be.visible').then(cy.wrap)
+            
+            IFRAME.clear().type(CONTENIDO)
+
+            // Adjuntar archivo
+            if (i < 5 ) {
+                cy.xpath("//input[@class='hidden']").selectFile(`cypress/e2e/CF/02_archivos/RES/publicacion${i}.jpg`, {force:true}).wait(2000)
+            } else {
+                cy.xpath("//input[@class='hidden']").selectFile("cypress/e2e/CF/02_archivos/RES/prueba3.png", {force:true}).wait(2000)
+            }
+
+            // Casilla 'Descargar al crear'
+            cy.get('#post_download_on_create').uncheck()
+
+            cy.get('#submit-button').should('be.visible').click({force:true})
+            cy.get('#confirm-modal').should('be.visible').click({force:true})
+            cy.get('.flash-success').should('be.visible')
+        }
+    })
+//*******************************************************************************
+    it('Eliminar Publicaciones', () => {
+        const ID_COMUNIDAD = '65958'
+
+        INICIO_ADMIN(mailAdmin, pass);
+
+        /*
+        // SUPER ADMIN
+        INICIO_SUPERADMIN(USER,PASS)
+        BUSCAR_COMUNIDAD(ID_COMUNIDAD);
+        // Acceder como SuperAdmin
+        cy.xpath("(//div[@class='btn btn-xs btn-green-cf'][contains(.,'Superadmin')])[1]").click({force:true});
+        */
+
+        cy.wait(2000)
+        CIERRE_MODALES();
+
+        cy.xpath("//div[@class='btn btn-default btn-xs'][contains(.,'Ver todas las publicaciones')]").click({force:true}).wait(1000)
+
+        let cantidad = []
+
+        cy.xpath("(//small[contains(.,'Borrar')])").each(($el,index) => {
+            cantidad[index] = $el
+        }).then(()=> {
+            for(let i = 0; i < cantidad.length; i++) {
+                cy.xpath("(//small[contains(.,'Borrar')])[1]").wait(500).click({force: true}).click({force: true}).wait(500)
+                cy.xpath("//button[@type='submit']").click({force: true})
+                cy.get('.flash-success').should('be.visible')
+            }
+        })
+    })
+//*******************************************************************************
     it('Recaudación (Admin)', () => {
 
         INICIO_ADMIN(mailAdmin, PASS);

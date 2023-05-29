@@ -39,11 +39,9 @@ export const BUSCAR_COMUNIDAD = (comunidad = NOMBRE) => {
   cy.xpath("//input[contains(@value,'Buscar')]").click({force:true})
 }
 
-// CIERRE DE MODALES
-
 export const MODAL_TYC = () => {
   // Verifcar modal de Términos y Condiciones
-  cy.get('div').each(($el,index, $list) => {
+  cy.get('h1').each(($el,index, $list) => {
 
     const TEXT1 = $el.text()
     const RESULTADO = TEXT1.includes('Condiciones')
@@ -52,10 +50,11 @@ export const MODAL_TYC = () => {
       cy.get('.btn').should('be.visible').click({force:true})
       cy.log('####### MODAL DE TERMINOS Y CONDICIONES CERRADO #######')
     }
-  })
+})
+  
 }
 
-/* export const MODAL_CAMBIAR_PASS_OLD = () => {
+export const MODAL_CAMBIAR_PASS = () => {
   // Verifcar modal de Cambia tu contraseña
   cy.get('h1').each(($el,index, $list) => {
 
@@ -67,25 +66,27 @@ export const MODAL_TYC = () => {
       cy.log('####### MODAL DE CAMBIAR CONTRASEÑA CERRADO #######')
     }
   })
+
 }
-*/
 
-export const MODAL_CAMBIAR_PASS = () => {
+export const MODAL_CAMBIAR_PASS_2 = () => {
   // Verifcar modal de Cambia tu contraseña
-
-  cy.get('div').each(($el,index, $list) => {
+  cy.xpath('//div').each(($el,index, $list) => {
 
     const TEXT1 = $el.text()
     const RESULTADO = TEXT1.includes('No por ahora')
-  
+
+  }).then(RESULTADO =>{
+        
     if (RESULTADO){
       cy.xpath("//a[contains(@href,'now=true')]").should('be.visible').click({force:true})
       cy.log('####### MODAL DE CAMBIAR CONTRASEÑA CERRADO #######')
     }
+
   })  
 }
 
-/* export const SELECCIONAR_COMUNIDAD_OLD = (aux = NOMBRE) => {
+export const SELECCIONAR_COMUNIDAD = (aux = NOMBRE) => {
   // Seleccionar comunidad (por fecha) si tiene más de una
 
   cy.get('h1').each(($el,index, $list) => {
@@ -108,29 +109,30 @@ export const MODAL_CAMBIAR_PASS = () => {
     }
   })   
 }
-*/
 
-export const SELECCIONAR_COMUNIDAD = (aux = NOMBRE) => {
+export const SELECCIONAR_COMUNIDAD_2 = (aux = NOMBRE) => {
   // Seleccionar ultima comunidad al iniciar como Admin
 
   cy.get('div').each(($el) => {
     
     const TEXT1 = $el.text()
-    const RESULTADO = TEXT1.includes('Comunidades que')
     let cantidad = 0
 
-    if (RESULTADO){
+    if (TEXT1.includes('Comunidades que')){
       cy.xpath("(//div[contains(@class,'col-xs-12 no-padding')])").each(($list) => {
         cantidad = $list.length + 1
       
       }).then(()=> {
         cy.xpath(`(//div[contains(@class,"col-xs-12 no-padding")])[${cantidad}]`).click({force: true})
       })
-    } 
+
+    } else {
+      cy.log('ADMIN CON UNA SOLA COMUNIDAD')
+    }
   })   
 }
 
-/* export const MODAL_BIENVENIDA_OLD = () => {
+export const MODAL_BIENVENIDA = () => {
   // Verificar modal de Bienvenido a CF
   cy.get('h1').each(($el,index, $list) => {
       
@@ -143,11 +145,10 @@ export const SELECCIONAR_COMUNIDAD = (aux = NOMBRE) => {
       }
   })
 }
-*/
 
-export const MODAL_BIENVENIDA = () => {
+export const MODAL_BIENVENIDA_2 = () => {
   // Verificar modal de Bienvenido a CF
-  cy.get('button').each(($el,index, $list) => {
+  cy.xpath('//button').each(($el,index, $list) => {
       
       const text1 = $el.text()
       const resultado = text1.includes('Iniciar Recorrido')
@@ -191,23 +192,37 @@ export const CIERRE_MODALES = () => {
     
   MODAL_TYC();
   MODAL_CAMBIAR_PASS();
-  SELECCIONAR_COMUNIDAD();
+  //SELECCIONAR_COMUNIDAD();
+  SELECCIONAR_COMUNIDAD_2();
+
   MODAL_BIENVENIDA();
-  //MODAL_BIBLIOTECA(); Descontinuado ?
+  MODAL_BIBLIOTECA();
   
 }
+
+export const CIERRE_MODALES_2 = () => {
+    
+  MODAL_TYC();
+  MODAL_CAMBIAR_PASS_2();
+  SELECCIONAR_COMUNIDAD_2();
+
+  MODAL_BIENVENIDA_2();
+  MODAL_BIBLIOTECA();
+  
+}
+
 
 export const ADMIN_CERRAR_SESION = () => {
   cy.xpath("(//a[contains(@data-title,'Mi Cuenta')])[1]").click({force:true})
   cy.xpath("(//a[@href='/log_out'][contains(.,'Cerrar sesión')])[1]").click({force:true});
 }
 
-// MÓDULOS ADMIN
-
+// Módulo Medidores
 export const MEDIDORES = () => {
   cy.xpath("//span[@class='sidebar_text'][contains(.,'Medidores')]").click({force:true})
 }
 
+// Módulo Cargos
 export const MODULO_CARGOS = () => {
   cy.xpath("//div[@class='divLink'][contains(.,'Cargos')]").should("be.visible").click({force: true});
 }
