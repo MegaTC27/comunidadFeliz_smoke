@@ -36,7 +36,7 @@ describe('Smoke Test Residents', () => {
     const DATE2 = dayjs().format('DD/MM/YY');
 
     const NOMBRE = 'CC Cypress - ' + DATE;
-    const NOMBRE2 = 'CC Cypress - ' + DATE2;
+    let NOMBRE2 = 'CC Cypress - ' + DATE2;
 
     // FUNCIONES
 
@@ -73,7 +73,7 @@ describe('Smoke Test Residents', () => {
 
     it('Crear Comunidad', () => {                
 
-        let delay = 1300
+        let delay = 2000
 
         INICIO_SUPERADMIN(USER,PASS);
 
@@ -96,13 +96,11 @@ describe('Smoke Test Residents', () => {
         // País
         cy.get('#community_country_code').select('Chile',{force:true}).should('have.value','CL')
         cy.get('#autocomplete').type(direccion,{force:true}).tab()
-        cy.xpath("//input[@type='submit']").click({force:true}).wait(500)
+        cy.xpath("//input[@type='submit']").click({force:true}).as("Submit Primera página").wait(500)
 
         // Mail de contacto
-        cy.xpath("//input[contains(@id,'account_account_contacts_attributes_0__destroy')]").wait(500).click({force:true}).wait(500)
-        cy.get("#account_account_contacts_attributes_0_email").wait(500).type(USER,{force:true}).wait(1000)
-
-        cy.xpath("//input[@type='submit'][contains(@value,'Guardar')]").click({force:true})
+        cy.get('#account_account_contacts_attributes_1__destroy').click({force:true})
+        cy.xpath("//input[@type='submit'][contains(@value,'Guardar')]").click({force:true}).as("Submit Segunda página")
 
         // Otorgar permisos 
         cy.wait(500).reload().wait(1500)
@@ -239,7 +237,7 @@ describe('Smoke Test Residents', () => {
 
             cy.get('#submit-button').should('be.visible').click({force:true})
             cy.get('#confirm-modal').should('be.visible').click({force:true})
-            cy.get('.flash-success').should('be.visible')
+            cy.get('.flash-success').should('be.visible').as(`Publicación N°${i} creada`)
         }
     })
 //*******************************************************************************
@@ -262,7 +260,7 @@ describe('Smoke Test Residents', () => {
             for(let i = 0; i < cantidad.length; i++) {
                 cy.xpath("(//small[contains(.,'Borrar')])[1]").wait(500).click({force: true}).click({force: true}).wait(500)
                 cy.xpath("//button[@type='submit']").click({force: true})
-                cy.get('.flash-success').should('be.visible')
+                cy.get('.flash-success').should('be.visible').as(`Publicación Eliminada`)
             }
         })
     })
@@ -326,7 +324,7 @@ describe('Smoke Test Residents', () => {
             cy.get("#fund_name").type(`Fondo 00${i}`)
             cy.get("#fund_price").type(`Fondo ${i}000`)
             cy.xpath("//input[@value='Crear']").click({force:true})
-            cy.get('.flash-success').should('be.visible')
+            cy.get('.flash-success').should('be.visible').as(`Fondo N°${i}`)
         }
     })
 //*******************************************************************************
@@ -350,7 +348,7 @@ describe('Smoke Test Residents', () => {
         }).then(()=> {
             for(let i = 0; i < cantidad.length; i++) {
                 cy.xpath("(//div[contains(@class,'fa fa-trash-o')])[1]").should('be.visible').click({force:true})
-                cy.get('.flash-success').should('be.visible').wait(700)
+                cy.get('.flash-success').should('be.visible').wait(700).as(`Fondo eliminado`)
             }
         });     
 
@@ -377,7 +375,7 @@ describe('Smoke Test Residents', () => {
             cy.get("#service_billing_price").type(`${i}000`,{force:true})
             cy.xpath("//select[contains(@class,'form-control proratable_select')]").select(SELECT_FONDO,{force:true})
             cy.get("#submit_button_service_billing").click({force:true})
-            cy.get('.flash-success').should('be.visible')
+            cy.get('.flash-success').should('be.visible').as(`Egreso N°${i}`)
         }
     })
 //*******************************************************************************
@@ -404,12 +402,12 @@ describe('Smoke Test Residents', () => {
             
             cy.get("#income_fund_id").select(SELECT_FONDO,{force:true})
             cy.xpath("//input[@type='submit']").click({force:true})
-            cy.get('.flash-success').should('be.visible')
+            cy.get('.flash-success').should('be.visible').as(`Ingreso N°${i}`)
 
         }
     })
 //*******************************************************************************
-    it.only('Crear Residente - Admin', () => {
+    it('Crear Residente - Admin', () => {
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -451,7 +449,7 @@ describe('Smoke Test Residents', () => {
 
     })
 //*******************************************************************************
-    it('Recaudación / Egresos / Cargos / Ingresos',() => {  
+    it.only('Recaudación / Egresos / Cargos / Ingresos',() => {  
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -500,7 +498,7 @@ describe('Smoke Test Residents', () => {
             cy.get('#price_new_payment').should("be.visible").type(monto, {force: true});
 
             // Crear
-            cy.get('#submit-button').click({force:true})
+            cy.get('#submit-button').click({force:true}).as(`Pago N°${i} realizado`)
         }
 
         // ----------------------------------------------------------------------------------------------------------------------
@@ -517,14 +515,14 @@ describe('Smoke Test Residents', () => {
             // Pago sin cuotas
             if (i == 0){
                 cy.get('#category_id').select('Administración', {force:true})
-                cy.get('#submit_button_service_billing').should('be.visible').click({force:true})
+                cy.get('#submit_button_service_billing').should('be.visible').click({force:true}).as(`Egreso sin cuotas realizado`)
                 cy.xpath("//div[@class='btn btn-default btn-xs pull-right'][contains(.,'Volver')]").should('be.visible').click({force:true})
 
             // Pago con cuotas 
             } else if (i == 1){
                 cy.get('#category_id').select('Mantención', {force:true})
                 cy.get('#service_billing_number_of_fees').select(cuotas, {force:true}).should('have.value',cuotas+1)
-                cy.get('#submit_button_service_billing').should('be.visible').click({force:true})
+                cy.get('#submit_button_service_billing').should('be.visible').click({force:true}).as(`Egreso con cuotas realizado`)
                 cy.xpath("//div[@class='btn btn-default btn-xs pull-right'][contains(.,'Volver')]").should('be.visible').click({force:true})
             
             // Pago con cuotas y porcentaje en fondo de reserva 
@@ -534,7 +532,7 @@ describe('Smoke Test Residents', () => {
                 cy.get('#show-advanced-proratable').click({force:true})
                 cy.xpath("(//input[contains(@id,'sb-proratable')])[1]").clear({force:true}).type(porcFondoReserva,{force:true})
                 
-                cy.get('#submit_button_service_billing').should('be.visible').click({force:true})
+                cy.get('#submit_button_service_billing').should('be.visible').click({force:true}).as(`Egreso con cuotas a fondos realizado`)
                 cy.xpath("//div[@class='btn btn-default btn-xs pull-right'][contains(.,'Volver')]").should('be.visible').click({force:true})
             }
         } 
@@ -573,7 +571,7 @@ describe('Smoke Test Residents', () => {
             }
 
             // Crear
-            cy.xpath("//input[@type='submit']").click({force:true})
+            cy.xpath("//input[@type='submit']").click({force:true}).as(`Cargo N°${i} realizado`)
         }
 
         // ----------------------------------------------------------------------------------------------------------------------
@@ -609,7 +607,7 @@ describe('Smoke Test Residents', () => {
             cy.get("#income_note").type(`Ingreso Cypress ${i}`,{force:true})
 
             // Crear
-            cy.xpath("//input[@type='submit']").click({force:true})
+            cy.xpath("//input[@type='submit']").click({force:true}).as(`Ingreso N°${i} realizado`)
         }
     })
 //*******************************************************************************
@@ -648,15 +646,20 @@ describe('Smoke Test Residents', () => {
 //*******************************************************************************
     it('Registro solicitud de propiededad (RES)',() => {  
 
+        mailRes= "cop5.juan.treppo@cf.cl"
+        NOMBRE2 = "CC CYPRESS - RES"
+
         INICIO_ADMIN(mailRes,pass)
         cy.wait(5000)
         RES_CIERRE_MODALES()
 
-        let contador = 1;
         cy.wait(2000)
         
         // INDICAR EN EL PARAMETRO DEL FOR LAS UNIDADES A REGISTRAR
-        for (let i = 1; i <=3; i++){
+        const PRIMERA_UNIDAD = 15
+        const ULTIMA_UNIDAD = 19
+
+        for (let i = PRIMERA_UNIDAD; i <= ULTIMA_UNIDAD; i++){
 
             // Acceder a 'Mis Propiedades'
             cy.xpath('(//button[contains(@class,"css-o8riuk")])[2]').should('be.visible').wait(500).click({force:true});
@@ -673,19 +676,18 @@ describe('Smoke Test Residents', () => {
             cy.xpath("(//div[contains(@role,'menuitem')])[2]").wait(1000).click();
 
             // Rol
-            if (contador == 2){
+            if (i == PRIMERA_UNIDAD){
                 cy.xpath("//button[@value='LESSEE']").click({force:true})    
-            } else if (contador == 3){
+            } else if (i == (PRIMERA_UNIDAD+1)){
                 cy.xpath("//button[@value='BROKER']").click({force:true})    
             } else {
                 cy.xpath("//button[@value='OWNER']").click({force:true})    
             }
-        
-            contador += contador
-      
+           
             // Aceptar
             cy.xpath("//button[contains(.,'Continuar')]").click({force:true}).wait(1000)
-            cy.xpath("//div[@role='alert'][contains(.,'Tu propiedad fue registrada con éxito')]").should('be.visible').wait(3000)
+            cy.xpath("//div[@role='alert'][contains(.,'Tu propiedad fue registrada con éxito')]")
+            .should('be.visible').wait(3000).as(`Registro creado`)
         }
     })
 //*******************************************************************************

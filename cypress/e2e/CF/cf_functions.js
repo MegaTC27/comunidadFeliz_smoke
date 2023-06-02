@@ -43,32 +43,26 @@ export const BUSCAR_COMUNIDAD = (comunidad = NOMBRE) => {
 
 export const MODAL_TYC = () => {
   // Verifcar modal de Términos y Condiciones
-  cy.get('div').each(($el,index, $list) => {
+
+  let aux = false
+
+  cy.get('a').each(($el,index, $list) => {
 
     const TEXT1 = $el.text()
-    const RESULTADO = TEXT1.includes('Condiciones')
+    const RESULTADO = TEXT1.includes('He leído y acepto las Condiciones de Uso')
     
     if (RESULTADO){
-      cy.get('.btn').should('be.visible').click({force:true})
-      cy.log('####### MODAL DE TERMINOS Y CONDICIONES CERRADO #######')
+      aux = true
+    }
+
+  }).then(()=>{
+
+    if (aux){
+      cy.xpath("//div[contains(@class,'btn btn-success')]").should('be.visible').click({force:true})
+      cy.log('MODAL DE TERMINOS Y CONDICIONES').as("CERRADO")
     }
   })
 }
-
-/* export const MODAL_CAMBIAR_PASS_OLD = () => {
-  // Verifcar modal de Cambia tu contraseña
-  cy.get('h1').each(($el,index, $list) => {
-
-    const TEXT1 = $el.text()
-    const RESULTADO = TEXT1.includes('Cambia tu')
-    
-    if (RESULTADO){
-      cy.get(':nth-child(3) > .btn').should('be.visible').click({force:true})
-      cy.log('####### MODAL DE CAMBIAR CONTRASEÑA CERRADO #######')
-    }
-  })
-}
-*/
 
 export const MODAL_CAMBIAR_PASS = () => {
   // Verifcar modal de Cambia tu contraseña
@@ -80,36 +74,10 @@ export const MODAL_CAMBIAR_PASS = () => {
 
     if (RESULTADO){
       cy.xpath("//a[contains(@href,'now=true')]").should('be.visible').click({force:true})
-      cy.log('####### MODAL DE CAMBIAR CONTRASEÑA CERRADO #######')
-            
+      cy.log('MODAL CAMBIAR CONTRASEÑA').as("CERRADO")
     }
   })  
 }
-
-/* export const SELECCIONAR_COMUNIDAD_OLD = (aux = NOMBRE) => {
-  // Seleccionar comunidad (por fecha) si tiene más de una
-
-  cy.get('h1').each(($el,index, $list) => {
-
-    const TEXT1 = $el.text()
-       
-    if (TEXT1.includes('Comunidades que')){
-
-      cy.get('h4').each(($el,index, $list) => {
-          let text2 = $el.text()
-      
-          if (text2.includes(NOMBRE)){
-              cy.wrap($el).click({force:true})
-              cy.log('####### MODAL DE SELECCIONAR COMUNIDAD CERRADO #######')
-          }
-      })
-
-    } else {
-      cy.log('ADMIN CON UNA SOLA COMUNIDAD')
-    }
-  })   
-}
-*/
 
 export const SELECCIONAR_COMUNIDAD = (aux = NOMBRE) => {
   // Seleccionar ultima comunidad al iniciar como Admin
@@ -130,6 +98,7 @@ export const SELECCIONAR_COMUNIDAD = (aux = NOMBRE) => {
   }).then(()=> {
     if (cantidad > 0){
       cy.xpath(`(//div[contains(@class,"col-xs-12 no-padding")])[${cantidad}]`).click({force: true})
+      cy.log('SELECCIÓN DE COMUNIDAD').as("CERRADO")
     }
   })
 }
@@ -225,8 +194,7 @@ export const RES_MODAL_LATAM = () => {
       const RESULTADO = TEXT1.includes('Cerrar')
       
       if (RESULTADO){
-      cy.get('.btn-link').should('be.visible').click({force:true})
-      cy.log(' ####### MODAL DE LATAM CERRADO ####### ')
+        cy.get('.btn-link').should('be.visible').click({force:true}).as("MODAL DE LATAM")
       }
   })
 }
@@ -238,8 +206,7 @@ export const RES_BIENVENIDA = () => {
       const RESULTADO = TEXT1.includes('¡Te damos la bienvenida')
       
       if (RESULTADO){
-        cy.xpath("//button[contains(.,'Entendido')]").should('be.visible').click({force:true})
-        cy.log(' ####### MODAL DE BIENVENIDA CERRADO ####### ')
+        cy.xpath("//button[contains(.,'Entendido')]").should('be.visible').click({force:true}).as("MODAL DE BIENVENIDA")
       }
   })
 }
@@ -251,8 +218,7 @@ export const RES_MODAL_NUEVA_VISTA = () => {
       const RESULTADO = TEXT1.includes('Quizás más tarde')
       
       if (RESULTADO){
-      cy.xpath("//button[contains(.,'Quizás más tarde')]").should('be.visible').click({force:true})
-      cy.log(' ####### MODAL DE NUEVO PORTAL CERRADO ####### ')
+        cy.xpath("//button[contains(.,'Quizás más tarde')]").should('be.visible').click({force:true}).as("MODAL NUEVO PORTAL")
       }
   })
 }
