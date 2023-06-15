@@ -59,7 +59,7 @@ export const MODAL_TYC = () => {
 
     if (aux){
       cy.xpath("//div[contains(@class,'btn btn-success')]").should('be.visible').click({force:true})
-      cy.log('MODAL DE TERMINOS Y CONDICIONES').as("CERRADO")
+      cy.log('MODAL DE TERMINOS Y CONDICIONES').as("MODAL TyC CERRADO")
     }
   })
 }
@@ -74,7 +74,7 @@ export const MODAL_CAMBIAR_PASS = () => {
 
     if (RESULTADO){
       cy.xpath("//a[contains(@href,'now=true')]").should('be.visible').click({force:true})
-      cy.log('MODAL CAMBIAR CONTRASEÑA').as("CERRADO")
+      cy.log('MODAL CAMBIAR CONTRASEÑA').as("MODAL CAMBIAR PASS CERRADO")
     }
   })  
 }
@@ -98,7 +98,7 @@ export const SELECCIONAR_COMUNIDAD = (aux = NOMBRE) => {
   }).then(()=> {
     if (cantidad > 0){
       cy.xpath(`(//div[contains(@class,"col-xs-12 no-padding")])[${cantidad}]`).click({force: true})
-      cy.log('SELECCIÓN DE COMUNIDAD').as("CERRADO")
+      cy.log('SELECCIÓN DE COMUNIDAD').as("SELECCIONAR COMUNIDAD CERRADO")
     }
   })
 }
@@ -245,4 +245,48 @@ export const RES_TERMINOS_CONDICIONES = () => {
 export const RES_CERRAR_SESION = () =>{
   cy.xpath('(//button[contains(@class,"css-o8riuk")])[2]').click({force:true});
   cy.xpath("//div[@role='menuitem'][contains(.,'Cerrar sesión')]").click({force:true});
+}
+
+export const RUT_GENERATOR = () => {
+
+  // Función para generar un dígito verificador aleatorio
+  function generarDigitoVerificador() {
+    var rut = '';
+    
+    for (var i = 0; i < 8; i++) {
+        rut += Math.floor(Math.random() * 10);
+    }
+
+    var verificador = 0;
+    var factor = 2;
+    
+    for (var i = rut.length - 1; i >= 0; i--) {
+        verificador += parseInt(rut.charAt(i)) * factor;
+        factor = factor === 7 ? 2 : factor + 1;
+    }
+    
+    verificador = 11 - (verificador % 11);
+    
+    if (verificador === 11) {
+    return '0';
+    } else if (verificador === 10) {
+    return 'K';
+    } else {
+    return verificador.toString();
+    }
+  }
+
+  // Función para generar un RUT chileno válido
+  function generarRUT() {
+      var rut = '';
+      for (var i = 0; i < 7; i++) {
+          rut += Math.floor(Math.random() * 10);
+      }
+      rut += '-' + generarDigitoVerificador();
+      return rut;
+  }
+
+  // Resultado
+  var rutGenerado = generarRUT();
+  cy.log(rutGenerado);
 }

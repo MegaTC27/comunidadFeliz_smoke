@@ -252,7 +252,7 @@ describe('Smoke Test CC', () => {
         }
     })
 //*******************************************************************************
-    it('Eliminar Publicaciones', () => {
+    it.only('Eliminar Publicaciones', () => {
         const ID_COMUNIDAD = '65958'
 
         INICIO_ADMIN(mailAdmin, pass);
@@ -276,8 +276,8 @@ describe('Smoke Test CC', () => {
             cantidad[index] = $el
         }).then(()=> {
             for(let i = 0; i < cantidad.length; i++) {
-                cy.xpath("(//small[contains(.,'Borrar')])[1]").wait(500).click({force: true}).click({force: true}).wait(500)
-                cy.xpath("//button[@type='submit']").click({force: true})
+                cy.xpath("(//small[contains(.,'Borrar')])[1]").wait(1000).click({force: true}).wait(1000)
+                cy.get("a").contains("Eliminar").click({force: true})
                 cy.get('.flash-success').should('be.visible')
             }
         })
@@ -731,7 +731,7 @@ describe('Smoke Test CC', () => {
 
     })
 //*******************************************************************************
-    it.only('Desactivar Comunidad', () => { 
+    it('Desactivar Comunidad', () => { 
 
         let aux = 'Cypress - ' + DATE2
 

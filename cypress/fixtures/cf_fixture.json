@@ -25,6 +25,8 @@
 
   "WEB_SMOKE": "https://smoke.comunidadfeliz.com/",
 
+  "WEB_ROR": "https://ror.comunidadfeliz.com/",
+
   
   "RUTA_EXCEL_PROPIEDADES_CC": "cypress/e2e/CF/02_archivos/CC/PropiedadestipoCasaFunk.xlsx",
   "RUTA_EXCEL_PAGOS_CC": "cypress/e2e/CF/02_archivos/CC/SaldosTipoCasaFunk.xlsx",

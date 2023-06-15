@@ -4,7 +4,7 @@ require('cypress-iframe')
 
 const dayjs = require('dayjs')  // Importar fecha
 const { DIMENSIONES, PAGINA_INICIAL, INICIO_SUPERADMIN, INICIO_ADMIN, BUSCAR_COMUNIDAD,
-    CIERRE_MODALES, RES_CIERRE_MODALES, RES_TERMINOS_CONDICIONES } = require('../cf_functions');
+    CIERRE_MODALES, RES_CIERRE_MODALES, RES_TERMINOS_CONDICIONES, RUT_GENERATOR } = require('../cf_functions');
 
 describe('Smoke Test Residents', () => {
 
@@ -407,7 +407,7 @@ describe('Smoke Test Residents', () => {
         }
     })
 //*******************************************************************************
-    it('Crear Residente - Admin', () => {
+    it('Crear Residente', () => {
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -449,7 +449,7 @@ describe('Smoke Test Residents', () => {
 
     })
 //*******************************************************************************
-    it.only('Recaudación / Egresos / Cargos / Ingresos',() => {  
+    it('Recaudación / Egresos / Cargos / Ingresos',() => {  
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -611,7 +611,7 @@ describe('Smoke Test Residents', () => {
         }
     })
 //*******************************************************************************
-    it('Gasto Común (Admin)', () => {
+    it('Gasto Común (ADMIN)', () => {
         
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -646,8 +646,8 @@ describe('Smoke Test Residents', () => {
 //*******************************************************************************
     it('Registro solicitud de propiededad (RES)',() => {  
 
-        mailRes= "cop5.juan.treppo@cf.cl"
-        NOMBRE2 = "CC CYPRESS - RES"
+        //mailRes= "cop5.juan.treppo@cf.cl"
+        NOMBRE2 = "CC Cypress - 12/06/23"
 
         INICIO_ADMIN(mailRes,pass)
         cy.wait(5000)
@@ -656,8 +656,8 @@ describe('Smoke Test Residents', () => {
         cy.wait(2000)
         
         // INDICAR EN EL PARAMETRO DEL FOR LAS UNIDADES A REGISTRAR
-        const PRIMERA_UNIDAD = 15
-        const ULTIMA_UNIDAD = 19
+        const PRIMERA_UNIDAD = 2
+        const ULTIMA_UNIDAD = 4
 
         for (let i = PRIMERA_UNIDAD; i <= ULTIMA_UNIDAD; i++){
 
@@ -740,7 +740,7 @@ describe('Smoke Test Residents', () => {
     it('Validación de solicitud (RES)',() => {  
 
         INICIO_ADMIN(mailRes,pass)
-        cy.wait(5000)
+        cy.wait(8000)
         RES_CIERRE_MODALES()
        
         // Acceder a 'Mis Propiedades'
@@ -785,7 +785,40 @@ describe('Smoke Test Residents', () => {
         });     
     })
 //*******************************************************************************
-    it.only('Cartola',() => {  
+    it('Publicaciones (RES)',() => {  
+
+        INICIO_ADMIN(mailRes,pass)
+        cy.wait(4000)
+        RES_CIERRE_MODALES()
+
+        let cantidad = 0
+        let aux = 2
+
+        // Publicaciones en Home
+        cy.get("article").each(($el,index,$list) => {
+            cantidad = $list.length
+            aux = index + 1
+            
+            if (cantidad > 1 && index > 0) {
+                
+                cy.get(`article[type=button]:nth-child(${aux})`).should("be.visible").click({force:true})
+                cy.get("button[type='button']").contains('Entendido').click({force:true}).as(index + "° Publicacion")
+            }
+        })
+
+        // Publicaciones en Módulo
+        cy.get("button[href='/comunidad/publicaciones']").click({force:true})
+        cy.get("button[data-state*='closed'] > span").each(($el,index,$list) => {
+             cantidad = $list.length
+           
+            if (cantidad > 1) {
+                 cy.wrap($el).should("be.visible").click({force:true})
+                 cy.get("button[type='button']").contains('Entendido').click({force:true}).as((index+1) + "° Publicacion")
+            }
+        })
+    })
+//*******************************************************************************
+    it('Cartola (RES)',() => {  
 
         INICIO_ADMIN(mailRes,pass)
         cy.wait(4000)
@@ -800,7 +833,7 @@ describe('Smoke Test Residents', () => {
                 if ($value_home == $value_cartola){
                     cy.xpath("//p[contains(.,'Tu total a pagar es de')]/following-sibling::p").should("be.visible").as('MONTO CARTOLA = HOME')
                 } else {
-                    // En caso que hayan diferencias de montos, lo cual no deberia suceder,s se marca error
+                    // En caso que hayan diferencias de montos, lo cual no deberia suceder, se marca error
                     cy.console.error();
                 }
             })
@@ -825,7 +858,275 @@ describe('Smoke Test Residents', () => {
         })
     })
 //*******************************************************************************
-    it('Residente - Pago WebPay', () => {
+    it('Crear Encomiendas (ADMIN)',() => {
+        
+        const MODAL_ENCOMIENDA = () => {
+
+            cy.get('span').each(($el) => {
+              
+              const TEXT1 = $el.text()
+              const RESULTADO = TEXT1.includes('Sumamos un nuevo módulo de Encomiendas')
+          
+              if (RESULTADO){
+                cy.get("a[class*='shepherd-button shepherd-button-secondary-margin']").click({force:true}).as("MODAL ENCOMIENDA")
+              } 
+            })
+        }
+
+        // SUPER ADMIN
+        //INICIO_COMUNIDAD_SUPERADMIN()
+
+        INICIO_ADMIN(mailAdmin,pass)
+        CIERRE_MODALES()
+
+        cy.get("li").contains("Encomiendas").click({force:true}).wait(1000)
+
+        MODAL_ENCOMIENDA()
+
+        let nombre_recepcionado = "Cypress"
+        let apellido_recepcionado = "Reciever"
+        let comentario_encomienda = "Encomienda Cypress"
+
+        // Crear x cantidad de encomiendas
+        for (let i = 0; i < 6; i ++){
+
+            // Seleccionar unidad
+            cy.get("#package_property_id").select("A1",{force:true})
+
+            let empleado = false
+
+            // Verificar si existe el empleado
+            cy.xpath("//*[@id='package_receiver']/option").each(($el)=>{
+                const TEXT1 = $el.text()
+                const RESULTADO = TEXT1.includes(`${nombre_recepcionado} ${apellido_recepcionado}`)
+
+                if (RESULTADO){
+                    empleado = true
+                }
+
+            }).then(()=>{
+
+                // Si existe, lo selecciona
+                if (empleado){
+                    cy.get('#package_receiver').wait(1000).select(`${nombre_recepcionado} ${apellido_recepcionado}`,{force:true}).wait(1000)
+                
+                // Si no existe, lo crea
+                } else {
+                    cy.get('#package_receiver').wait(1000).select("Otro empleado",{force:true}).wait(1000)
+                    cy.get("#collaborators_package_employee_first_name").type(nombre_recepcionado,{force:true}) 
+                    cy.get("#collaborators_package_employee_last_name").type(apellido_recepcionado,{force:true})
+                    cy.get("#submit-employee-form").click({force:true}) 
+                }
+            })
+
+            // Comentario
+            cy.get("#package_comment").wait(1000).type(comentario_encomienda,{force:true})
+            
+            // Crear
+            cy.get('#submit-package-form-btn').wait(1000).click({force:true})
+            cy.get("#flash_notice").should("be.visible").as("Encomienda Creada")
+        }
+    })
+//*******************************************************************************
+    it('Retirar Encomiendas (ADMIN)',() => {
+            
+        const MODAL_ENCOMIENDA = () => {
+
+            cy.get('span').each(($el) => {
+            
+            const TEXT1 = $el.text()
+            const RESULTADO = TEXT1.includes('Sumamos un nuevo módulo de Encomiendas')
+        
+            if (RESULTADO){
+                cy.get("a[class*='shepherd-button shepherd-button-secondary-margin']").click({force:true}).as("MODAL ENCOMIENDA")
+            } 
+            })
+        }
+
+        // SUPER ADMIN
+        //INICIO_COMUNIDAD_SUPERADMIN()
+
+        INICIO_ADMIN(mailAdmin,pass)
+        CIERRE_MODALES()
+
+        cy.get("li").contains("Encomiendas").click({force:true}).wait(1000)
+
+        MODAL_ENCOMIENDA()
+
+        // Marcar salida a x cantidad de encomiendas
+        for (let i = 1; i <= 3; i ++){
+            cy.xpath(`(//span[@class='fa fa-check'])[1]`).wait(1000).click({force:true})
+            cy.get("#submit-btn").click({force:true})
+            cy.get("#flash_notice").should("be.visible").as("Encomienda Retirada").wait(1000)
+            cy.xpath("(//a[@href='/encomiendas'][contains(.,'Por retirar')])[1]").click({force:true})
+        }
+    })
+//*******************************************************************************
+    it('Verificar Encomiendas (RES)',() => {  
+
+        INICIO_ADMIN(mailRes,pass)
+        cy.wait(8000)
+        RES_CIERRE_MODALES()
+
+        cy.xpath("//button[contains(.,'Encomiendas')]").click({force:true})
+
+        // Encomiendas por retirar
+        let aux = 4
+
+        cy.xpath("(//div[contains(.,'Nueva')])").each(($el,$index) => {
+            if ($index >= aux) {
+                cy.get($el).click({force:true})
+                cy.get("button").contains("Cerrar").should("be.visible").click({force:true})
+            }
+        })
+
+        // Encomiendas retiradas
+        aux = 7
+        cy.xpath("//button[contains(@id,'DELIVERED')]").click({force:true}).as("Retiradas").wait(1000)
+
+        cy.xpath("(//div[contains(.,'Retirada')])").each(($el,$index) => {
+            if ($index >= aux) {
+                cy.get($el).click({force:true})
+                cy.get("button").contains("Cerrar").should("be.visible").click({force:true})
+            }
+        })
+    })
+//*******************************************************************************
+    it('Crear Visitas (RES)',() => {  
+
+        mailRes = "Res_cyp_120623@gmail.com"
+
+        INICIO_ADMIN(mailRes,pass)
+        cy.wait(4000)
+        RES_CIERRE_MODALES()
+
+        // Visitas autorizadas
+ 
+        // Default: i = 4
+        for (let i=1; i <= 4; i++){
+
+            let nombre_visita = "Visita Cypress - " + i 
+            let mail_visita = USER
+
+            cy.xpath("//button[contains(.,'Visitas')]").click({force:true}).wait(4000)
+
+            cy.xpath("(//button[contains(.,'Nueva visita')])[1]").should("be.visible").click({force:true})
+            cy.xpath("//button[contains(.,'Continuar')]").should("be.visible").wait(1000).click({force:true})
+
+            cy.get('[name = "name"]').type(nombre_visita,{force:true})
+
+            if (i == 2){
+                cy.xpath("//input[@value='Visita']").click({force:true}).should("be.visible")
+                cy.xpath("//div[@role='menuitem'][contains(.,'Proveedor')]").click({force:true}).as("Proveedor")
+            } else if (i == 3){
+                cy.xpath("//input[@value='Visita']").click({force:true}).should("be.visible")
+                cy.xpath("//div[@role='menuitem'][contains(.,'Arrendatario')]").click({force:true}).as("Arrendatario")
+            } else if (i == 4){
+                cy.xpath("//input[@value='Visita']").click({force:true}).should("be.visible")
+                cy.xpath("//div[@role='menuitem'][contains(.,'Otro')]").click({force:true}).as("Otro")
+            } else {
+                cy.xpath("//input[@value='Visita']").click({force:true}).should("be.visible")
+                cy.xpath("//div[@role='menuitem'][contains(.,'Visita')]").click({force:true}).as("Visita")
+            }
+
+            // Compartir por mail
+            cy.xpath("//button[@value='yes']").click({force:true})
+            cy.xpath("//button[@value='mail']").click({force:true})
+            cy.get('[name = "email"]').type(mail_visita,{force:true})
+
+            // Guardar y compartir
+            cy.xpath("//button[contains(.,'Guardar y compartir')]")
+            .click({force:true}).as(`Visita Creada`)
+
+            cy.xpath("//button[contains(.,'Ir atrás')]").wait(1500).click({force:true})
+        }
+    })
+//*******************************************************************************
+    it('Eliminar Visitas (RES)',() => {  
+
+        mailRes = "Res_cyp_120623@gmail.com"
+
+        INICIO_ADMIN(mailRes,pass)
+        cy.wait(4000)
+        RES_CIERRE_MODALES()
+
+        cy.xpath("//button[contains(.,'Visitas')]").click({force:true}).wait(1500)
+
+        const ELIMINAR_VISITAS = () => {
+            cy.xpath("(//span[@type='button'])").each(($el,$index) => {
+                cy.wrap($el).click({force:true})
+                cy.xpath("//div[@role='menuitem'][contains(.,'Eliminar')]").click({force:true})
+                cy.xpath("//button[contains(.,'Quitar de esta lista')]").click({force:true})
+
+                cy.xpath("(//div[contains(.,'Visita  eliminada con éxito')])[8]").should("be.visible")
+            })
+        }
+        
+        ELIMINAR_VISITAS()
+    })
+//*******************************************************************************
+    it.only('Crear Visitas no autorizadas (RES)',() => {  
+
+        mailRes = "Res_cyp_120623@gmail.com"
+        INICIO_ADMIN(mailRes,pass)
+        cy.wait(4000)
+        RES_CIERRE_MODALES()
+
+        let nombre_no_autorizado = "Jorge Rial"
+        let comentario = "Comentario de prueba"
+        
+        // Función para generar un dígito verificador aleatorio
+        function generarDigitoVerificador() {
+            var rut = '';
+            
+            for (var i = 0; i < 8; i++) {
+                rut += Math.floor(Math.random() * 10);
+            }
+
+            var verificador = 0;
+            var factor = 2;
+            
+            for (var i = rut.length - 1; i >= 0; i--) {
+                verificador += parseInt(rut.charAt(i)) * factor;
+                factor = factor === 7 ? 2 : factor + 1;
+            }
+            
+            verificador = 11 - (verificador % 11);
+            
+            if (verificador === 11) {
+            return '0';
+            } else if (verificador === 10) {
+            return 'K';
+            } else {
+            return verificador.toString();
+            }
+        }
+        // Función para generar un RUT chileno válido
+        function generarRUT() {
+            var rut = '';
+            for (var i = 0; i < 7; i++) {
+                rut += Math.floor(Math.random() * 10);
+            }
+            rut += '-' + generarDigitoVerificador();
+            return rut;
+        }
+        // Resultado
+        var rutGenerado = generarRUT();
+       
+        // Visitas no autorizadas
+
+        cy.xpath("//button[contains(.,'Visitas')]").click({force:true}).wait(2000)
+        cy.get("button").contains('Nueva visita no autorizada').click({force:true})
+        
+        cy.xpath("//label[contains(.,'Nombre')]/following-sibling::input").type(nombre_no_autorizado,{force:true})
+        cy.xpath("//label[contains(.,'RUT')]/following-sibling::input").type(rutGenerado,{force:true})
+        cy.xpath("//label[contains(.,'Comentario')]/following-sibling::input").type(comentario,{force:true})
+
+        cy.xpath("//button[contains(.,'Guardar')]").click({force:true})
+
+    })
+//*******************************************************************************
+    it('Pago WebPay (RES)', () => {
 
         const AUX_MAIL = 'Cypress_231222_155314@gmail.com' 
         const DELAY = 500;
@@ -882,7 +1183,7 @@ describe('Smoke Test Residents', () => {
         cy.get('.btn-link').click({force:true}).wait(DELAY)
     })
 //*******************************************************************************
-    it('Residente - Pago WebPay OneClick', () => {
+    it('Pago WebPay OneClick (RES)', () => {
 
         const AUX_MAIL = 'Cypress_231222_155314@gmail.com' 
         const DELAY = 500;
@@ -962,4 +1263,4 @@ describe('Smoke Test Residents', () => {
 
         cy.get('.flash-success').should("be.visible")
     })
-})
+});
