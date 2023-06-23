@@ -4,7 +4,7 @@ require('cypress-iframe')
 
 const dayjs = require('dayjs')  // Importar fecha
 const { DIMENSIONES, PAGINA_INICIAL, INICIO_SUPERADMIN, INICIO_ADMIN, BUSCAR_COMUNIDAD,
-    CIERRE_MODALES, RES_CIERRE_MODALES, RES_TERMINOS_CONDICIONES, RUT_GENERATOR } = require('../cf_functions');
+    CIERRE_MODALES, RES_CIERRE_MODALES, RES_TERMINOS_CONDICIONES } = require('../cf_functions');
 
 describe('Smoke Test Residents', () => {
 
@@ -13,7 +13,6 @@ describe('Smoke Test Residents', () => {
     let apellidoAdmin = 'Pruebas'
     let dateAux = dayjs().format('DDMMYY');
     let mailAdmin = nombreAdmin + dateAux + '@gmail.com'
-//    let mailAdmin = 'cypressAux@gmail.com'
     
     // RESIDENTE
     
@@ -38,6 +37,21 @@ describe('Smoke Test Residents', () => {
     const NOMBRE = 'CC Cypress - ' + DATE;
     let NOMBRE2 = 'CC Cypress - ' + DATE2;
 
+    // RUTS
+
+    const RUT = [115057588,130314074,199598562,151932444,240642301,237966503,216315006,
+        139968557,210185445,66777081,"23662403k",150022959,55351295,178564986,155893540,217517540,
+        172284779,173224907,154119345,206526548,137780518,162109987,175406042,123910966,210714014,
+        76577471,217345820,239704751,225185328,"20666990k",176579110,"13365657k","18122939k",65755297,
+        209084740,218757707,153119538,64570706,53027881,233319643,70148420,232333383,110645848,
+        221707125,106301239,188681344,159438317,171682878,170137477,139673778,186730828,161123021,
+        206378654,144015541,116772973,"17320549k",204219729,133646337,144950844,69827187,133536604,
+        178640348,182164429,162190768,155179406,88284267,75195761,228510211,193580696,"5757724k",
+        91293943,156923982,244448534,169520267,177059382,169272328,156007692,115394533,223539769,
+        232193980,"17935215k",248951591,214500345,174473595,126224974,195829853,102542924,199584472,
+        197738871,53177506,180762752,184177544,99724544,59524720,216906667,110801734,50678245,148604339,
+        "22141277k",198778893]
+
     // FUNCIONES
 
     const INICIO_COMUNIDAD_SUPERADMIN = () => {
@@ -54,7 +68,7 @@ describe('Smoke Test Residents', () => {
             globalThis.data = data;
 
             // SUPER ADMIN
-            globalThis.WEB = data.WEB_5
+            globalThis.WEB = data.WEB_SMOKE
             globalThis.USER = data.USER_5
             globalThis.PASS = data.PASS_5
 
@@ -71,7 +85,7 @@ describe('Smoke Test Residents', () => {
 
     const ID_COMUNIDAD = '65958'
 
-    it('Crear Comunidad', () => {                
+    it.only('Crear Comunidad', () => {                
 
         let delay = 2000
 
@@ -146,7 +160,7 @@ describe('Smoke Test Residents', () => {
         cy.xpath("//span[contains(@id,'notice')][contains(.,'Administrador ingresado')]").should('be.visible')
     })
 //*******************************************************************************
-    it('Redireccionamiento a Residents',() => {  
+    it.only('Redireccionamiento a Residents',() => {  
 
         INICIO_SUPERADMIN(USER,PASS)
         BUSCAR_COMUNIDAD();
@@ -164,7 +178,7 @@ describe('Smoke Test Residents', () => {
         cy.xpath("//span[contains(@id,'flash_notice') and contains (.,'Setting actualizada')]").should('be.visible')
     })
 //*******************************************************************************    
-    it('Editar Comunidad',() => {  
+    it.only('Editar Comunidad',() => {  
 
         // SUPER ADMIN
         INICIO_COMUNIDAD_SUPERADMIN()
@@ -196,7 +210,7 @@ describe('Smoke Test Residents', () => {
 
     })
 //*******************************************************************************
-    it('Crear Publicación', () => {
+    it.only('Crear Publicación', () => {
                 
         // SUPER ADMIN
         INICIO_COMUNIDAD_SUPERADMIN()
@@ -265,7 +279,7 @@ describe('Smoke Test Residents', () => {
         })
     })
 //*******************************************************************************
-    it('Editar Pago en Linea',() => {  
+    it.only('Editar Pago en Linea',() => {  
 
         // SUPER ADMIN
         INICIO_COMUNIDAD_SUPERADMIN()
@@ -304,7 +318,7 @@ describe('Smoke Test Residents', () => {
 
     })
 //*******************************************************************************
-    it('Crear Fondos', () => {
+    it.only('Crear Fondos', () => {
 
         // SUPER ADMIN
         INICIO_COMUNIDAD_SUPERADMIN()
@@ -354,7 +368,7 @@ describe('Smoke Test Residents', () => {
 
     })
 //*******************************************************************************
-    it('Egresos contra Fondos', () => {
+    it.only('Egresos contra Fondos', () => {
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -379,7 +393,7 @@ describe('Smoke Test Residents', () => {
         }
     })
 //*******************************************************************************
-    it('Ingresos contra Fondos', () => {
+    it.only('Ingresos contra Fondos', () => {
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -407,7 +421,7 @@ describe('Smoke Test Residents', () => {
         }
     })
 //*******************************************************************************
-    it('Crear Residente', () => {
+    it.only('Crear Residente', () => {
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -449,7 +463,7 @@ describe('Smoke Test Residents', () => {
 
     })
 //*******************************************************************************
-    it('Recaudación / Egresos / Cargos / Ingresos',() => {  
+    it.only('Recaudación / Egresos / Cargos / Ingresos',() => {  
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -611,7 +625,7 @@ describe('Smoke Test Residents', () => {
         }
     })
 //*******************************************************************************
-    it('Gasto Común (ADMIN)', () => {
+    it.only('Gasto Común (ADMIN)',() => {
         
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -641,13 +655,13 @@ describe('Smoke Test Residents', () => {
         if (RESULTADO){
             cy.xpath("//span[contains(@id,'flash')]").should('contain','Procesos trabajando internamente').as('recalculando_gastos').wait(8000)
         }
-    })
+        })
     })
 //*******************************************************************************
-    it('Registro solicitud de propiededad (RES)',() => {  
+    it.only('Registro solicitud de propiededad (RES)',() => {  
 
         //mailRes= "cop5.juan.treppo@cf.cl"
-        NOMBRE2 = "CC Cypress - 12/06/23"
+        //NOMBRE2 = "CC Cypress - 12/06/23"
 
         INICIO_ADMIN(mailRes,pass)
         cy.wait(5000)
@@ -691,7 +705,7 @@ describe('Smoke Test Residents', () => {
         }
     })
 //*******************************************************************************
-    it('Eliminar registros de solicitud (ADMIN)',() => {  
+    it.only('Eliminar registros de solicitud (ADMIN)',() => {  
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -714,7 +728,7 @@ describe('Smoke Test Residents', () => {
         });     
     })
 //*******************************************************************************
-    it('Aceptar registros de solicitud (ADMIN)',() => {  
+    it.only('Aceptar registros de solicitud (ADMIN)',() => {  
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -737,7 +751,7 @@ describe('Smoke Test Residents', () => {
         });     
     })
 //*******************************************************************************
-    it('Validación de solicitud (RES)',() => {  
+    it.only('Validación de solicitud (RES)',() => {  
 
         INICIO_ADMIN(mailRes,pass)
         cy.wait(8000)
@@ -760,7 +774,7 @@ describe('Smoke Test Residents', () => {
         }
     })
 //*******************************************************************************
-    it('Aceptación de validación (ADMIN)',() => {  
+    it.only('Aceptación de validación (ADMIN)',() => {  
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
@@ -785,7 +799,7 @@ describe('Smoke Test Residents', () => {
         });     
     })
 //*******************************************************************************
-    it('Publicaciones (RES)',() => {  
+    it.only('Publicaciones (RES)',() => {  
 
         INICIO_ADMIN(mailRes,pass)
         cy.wait(4000)
@@ -818,7 +832,7 @@ describe('Smoke Test Residents', () => {
         })
     })
 //*******************************************************************************
-    it('Cartola (RES)',() => {  
+    it.only('Cartola (RES)',() => {  
 
         INICIO_ADMIN(mailRes,pass)
         cy.wait(4000)
@@ -858,7 +872,7 @@ describe('Smoke Test Residents', () => {
         })
     })
 //*******************************************************************************
-    it('Crear Encomiendas (ADMIN)',() => {
+    it.only('Crear Encomiendas (ADMIN)',() => {
         
         const MODAL_ENCOMIENDA = () => {
 
@@ -875,6 +889,8 @@ describe('Smoke Test Residents', () => {
 
         // SUPER ADMIN
         //INICIO_COMUNIDAD_SUPERADMIN()
+
+        mailAdmin = "cypress120623@gmail.com"
 
         INICIO_ADMIN(mailAdmin,pass)
         CIERRE_MODALES()
@@ -928,8 +944,10 @@ describe('Smoke Test Residents', () => {
         }
     })
 //*******************************************************************************
-    it('Retirar Encomiendas (ADMIN)',() => {
+    it.only('Retirar Encomiendas (ADMIN)',() => {
             
+      // mailAdmin = "cypress120623@gmail.com"
+
         const MODAL_ENCOMIENDA = () => {
 
             cy.get('span').each(($el) => {
@@ -962,7 +980,7 @@ describe('Smoke Test Residents', () => {
         }
     })
 //*******************************************************************************
-    it('Verificar Encomiendas (RES)',() => {  
+    it.only('Verificar Encomiendas (RES)',() => {  
 
         INICIO_ADMIN(mailRes,pass)
         cy.wait(8000)
@@ -992,9 +1010,9 @@ describe('Smoke Test Residents', () => {
         })
     })
 //*******************************************************************************
-    it('Crear Visitas (RES)',() => {  
+    it.only('Crear Visitas (RES)',() => {  
 
-        mailRes = "Res_cyp_120623@gmail.com"
+        //mailRes = "Res_cyp_120623@gmail.com"
 
         INICIO_ADMIN(mailRes,pass)
         cy.wait(4000)
@@ -1037,8 +1055,6 @@ describe('Smoke Test Residents', () => {
             // Guardar y compartir
             cy.xpath("//button[contains(.,'Guardar y compartir')]")
             .click({force:true}).as(`Visita Creada`)
-
-            cy.xpath("//button[contains(.,'Ir atrás')]").wait(1500).click({force:true})
         }
     })
 //*******************************************************************************
@@ -1058,7 +1074,7 @@ describe('Smoke Test Residents', () => {
                 cy.xpath("//div[@role='menuitem'][contains(.,'Eliminar')]").click({force:true})
                 cy.xpath("//button[contains(.,'Quitar de esta lista')]").click({force:true})
 
-                cy.xpath("(//div[contains(.,'Visita  eliminada con éxito')])[8]").should("be.visible")
+                cy.xpath("(//div[contains(.,'Visita  eliminada con éxito')])[8]").should("be.visible").wait(1500)
             })
         }
         
@@ -1067,63 +1083,52 @@ describe('Smoke Test Residents', () => {
 //*******************************************************************************
     it.only('Crear Visitas no autorizadas (RES)',() => {  
 
-        mailRes = "Res_cyp_120623@gmail.com"
+       // mailRes = "Res_cyp_120623@gmail.com"
         INICIO_ADMIN(mailRes,pass)
         cy.wait(4000)
         RES_CIERRE_MODALES()
 
-        let nombre_no_autorizado = "Jorge Rial"
+        let nombre_no_autorizado = "Persona no grata"
         let comentario = "Comentario de prueba"
-        
-        // Función para generar un dígito verificador aleatorio
-        function generarDigitoVerificador() {
-            var rut = '';
-            
-            for (var i = 0; i < 8; i++) {
-                rut += Math.floor(Math.random() * 10);
-            }
 
-            var verificador = 0;
-            var factor = 2;
-            
-            for (var i = rut.length - 1; i >= 0; i--) {
-                verificador += parseInt(rut.charAt(i)) * factor;
-                factor = factor === 7 ? 2 : factor + 1;
-            }
-            
-            verificador = 11 - (verificador % 11);
-            
-            if (verificador === 11) {
-            return '0';
-            } else if (verificador === 10) {
-            return 'K';
-            } else {
-            return verificador.toString();
-            }
-        }
-        // Función para generar un RUT chileno válido
-        function generarRUT() {
-            var rut = '';
-            for (var i = 0; i < 7; i++) {
-                rut += Math.floor(Math.random() * 10);
-            }
-            rut += '-' + generarDigitoVerificador();
-            return rut;
-        }
-        // Resultado
-        var rutGenerado = generarRUT();
-       
         // Visitas no autorizadas
 
-        cy.xpath("//button[contains(.,'Visitas')]").click({force:true}).wait(2000)
-        cy.get("button").contains('Nueva visita no autorizada').click({force:true})
-        
-        cy.xpath("//label[contains(.,'Nombre')]/following-sibling::input").type(nombre_no_autorizado,{force:true})
-        cy.xpath("//label[contains(.,'RUT')]/following-sibling::input").type(rutGenerado,{force:true})
-        cy.xpath("//label[contains(.,'Comentario')]/following-sibling::input").type(comentario,{force:true})
+        for (let i =0;i<=2;i++){
+            let randomNumber = Math.floor(Math.random() * 99) + 1;
 
-        cy.xpath("//button[contains(.,'Guardar')]").click({force:true})
+            cy.xpath("//button[contains(.,'Visitas')]").click({force:true}).wait(2000)
+            cy.get("button").contains('Nueva visita no autorizada').click({force:true})
+            
+            cy.xpath("//label[contains(.,'Nombre')]/following-sibling::input").type(nombre_no_autorizado,{force:true})
+            cy.xpath("//label[contains(.,'RUT')]/following-sibling::input").type(RUT[randomNumber],{force:true})
+            cy.xpath("//label[contains(.,'Comentario')]/following-sibling::input").type(comentario,{force:true})
 
+            cy.xpath("//button[contains(.,'Guardar')]").click({force:true})
+            cy.get("div").contains("Visita no autorizada registrada con éxito").should("be.visible").wait(1000)
+        }
+    })
+//*******************************************************************************
+    it('Eliminar Visitas no autorizadas (RES)',() => {  
+
+        mailRes = "Res_cyp_120623@gmail.com"
+
+        INICIO_ADMIN(mailRes,pass)
+        cy.wait(4000)
+        RES_CIERRE_MODALES()
+
+        cy.xpath("//button[contains(.,'Visitas')]").click({force:true}).wait(3000)
+
+        const ELIMINAR_VISITAS = () => {
+            cy.xpath("//p[contains(.,'Persona no grata')]").each(($el,$index) => {
+                cy.xpath("(//p[contains(.,'Persona no grata')])[1]").click({force:true})
+                cy.get("span").contains("Quitar de esta lista").click({force:true})
+                cy.get("span").contains("Sí").click({force:true})
+                
+                cy.xpath("//button[contains(.,'Quitar de esta lista')]").click({force:true})
+                cy.get("div").contains("Visita no autorizada eliminada con éxito").should("be.visible").as("Visita Eliminada").wait(1500)
+            })
+        }
+        ELIMINAR_VISITAS()
     })
 //*******************************************************************************
     it('Pago WebPay (RES)', () => {
@@ -1239,7 +1244,7 @@ describe('Smoke Test Residents', () => {
         cy.get('.btn-link').click({force:true}).wait(DELAY)
     })
 //*******************************************************************************
-    it('Desactivar Comunidad', () => { 
+    it.only('Desactivar Comunidad', () => { 
 
         let aux = 'Cypress - ' + DATE2
 

@@ -2,7 +2,7 @@ require('cypress-xpath')        // Selector de Xpath
 require('cypress-plugin-tab')   // Tabulacion por comando
 
 const dayjs = require('dayjs')  // Importar fecha
-const { DIMENSIONES, PAGINA_INICIAL, INICIO_SUPERADMIN, INICIO_ADMIN, BUSCAR_COMUNIDAD, CIERRE_MODALES,  } = require('../cf_functions');
+const { DIMENSIONES, PAGINA_INICIAL, INICIO_SUPERADMIN, INICIO_ADMIN, BUSCAR_COMUNIDAD, CIERRE_MODALES  } = require('../cf_functions');
 
 describe('Smoke Test CC', () => {
 
