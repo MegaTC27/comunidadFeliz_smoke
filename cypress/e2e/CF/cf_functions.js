@@ -21,6 +21,10 @@ export const PAGINA_INICIAL  = (w = WEB) => {
   cy.title().should('eq','ComunidadFeliz');      
 }
 
+export const PAGINA_INICIAL_VERCEL  = (w = WEB) => {
+  cy.visit(w);
+}
+
 export const INICIO_SUPERADMIN = (u= USER, p = PASS) => {
   cy.get('#email').should('be.visible').type(u)
   cy.get('#password').type(p)
@@ -289,4 +293,61 @@ export const RUT_GENERATOR = () => {
   // Resultado
   var rutGenerado = generarRUT();
   cy.log(rutGenerado);
+}
+
+export const OBTENER_FECHA_MANIANA = () => {
+  // Obtener la fecha actual
+  var fechaActual = new Date();
+
+  // Obtener el día actual
+  var diaActual = fechaActual.getDate();
+
+  // Obtener el mes actual (se resta 1 porque los meses empiezan en 0)
+  var mesActual = fechaActual.getMonth();
+
+  // Obtener el año actual
+  var anioActual = fechaActual.getFullYear();
+
+  // Determinar la cantidad de días en el mes actual
+  var diasEnElMes = new Date(anioActual, mesActual + 1, 0).getDate();
+
+  // Calcular la fecha de mañana
+  var diaManiana = diaActual + 1;
+  var mesManiana = mesActual;
+  var anioManiana = anioActual;
+
+  // Comprobar si es necesario ajustar el mes o el año
+  if (diaManiana > diasEnElMes) {
+      diaManiana = 1;
+      mesManiana++;
+
+      if (mesManiana > 11) {
+          mesManiana = 0;
+          anioManiana++;
+      }
+  }
+
+  // Crear la fecha del día de mañana
+  var fechaManiana = new Date(anioManiana, mesManiana, diaManiana);
+
+  // Formatear la fecha en formato DD/MM/AAAA
+  var diaManianaFormateado = ("0" + fechaManiana.getDate()).slice(-2);
+  var mesManianaFormateado = ("0" + (fechaManiana.getMonth() + 1)).slice(-2);
+  var anioManianaFormateado = fechaManiana.getFullYear();
+
+  // Generar la fecha de mañana
+  fechaManiana = `${diaManianaFormateado}/${mesManianaFormateado}/${anioManianaFormateado}`
+
+  // Devolver la fecha de mañana
+  return fechaManiana;
+}
+
+export const INICIO_VERCEL = (mail, pass) => {
+
+  cy.get('[name="email"]').clear().type(mail,{force:true})
+  cy.get('[name="password"]').clear().type(pass,{force:true})
+
+  cy.get("button").contains("Sign in").click({force:true}).wait(1500)
+  cy.get("a").contains("Return").click({force:true}).wait(1500)
+
 }

@@ -27,6 +27,8 @@
 
   "WEB_ROR": "https://ror.comunidadfeliz.com/",
 
+  "VERCEL": "https://residents-front-git-rt-681-rollbar-error-32-comunidad-feliz.vercel.app/signIn",
+
   
   "RUTA_EXCEL_PROPIEDADES_CC": "cypress/e2e/CF/02_archivos/CC/PropiedadestipoCasaFunk.xlsx",
   "RUTA_EXCEL_PAGOS_CC": "cypress/e2e/CF/02_archivos/CC/SaldosTipoCasaFunk.xlsx",
