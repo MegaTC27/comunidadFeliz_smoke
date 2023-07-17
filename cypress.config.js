@@ -12,5 +12,10 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
+    viewportWidth: 1500,
+    viewportHeight: 1000,
+    defaultCommandTimeout: 3000,
+    watchForFileChanges: false,
+    "baseUrl": "https://test4.comunidadfeliz.com/",
   },
 });

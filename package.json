@@ -16,7 +16,8 @@
     "cypress-xpath": "^2.0.1"
   },
   "dependencies": {
-    "cypress-real-events": "^1.7.4"
+    "cypress-real-events": "^1.7.4",
+    "dayjs": "^1.11.9"
   },
   "repository": {
     "type": "git",
