@@ -1,0 +1,18 @@
+
+{
+    
+        "test4": {
+            "user":"quelys",
+            "url":"https://test4.comunidadfeliz.com/",
+            "usuario": "quelys.rodriguez@comunidadfeliz.cl",
+            "contraseña": "feliz23."
+        },
+        "test2": {
+            "user":"rodrigo",
+            "url":"https://test2.comunidadfeliz.com/",
+            "usuario": "quelys.rodriguez@comunidadfeliz.cl",
+            "contraseña": "feliz23."
+        }
+
+ 
+}

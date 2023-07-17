@@ -1,0 +1,7 @@
+{
+    "residentes_y_saldos":{
+        "propiedades_CC": "cypress/e2e/CF/02_archivos/CC/PropiedadestipoCasaFunk.xlsx",
+        "saldos_CC":"cypress/e2e/CF/02_archivos/CC/SaldosTipoCasaFunk.xlsx"
+    }
+  
+}    
